@@ -1,129 +1,99 @@
 import React, { Component } from "react";
-import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
 import axios from "axios";
 import settings from "../settings/settings";
+import { Formik, Form } from "formik";
+import * as Yup from "yup";
+
+import "../styles/Form.scss";
+import FormField from "../components/forms/FormField";
+import FormButton from "../components/forms/FormButton";
+
+const createTicketSchema = Yup.object().shape({
+  issue: Yup.string().required().label("Issue"),
+  //   loggedBy: Yup.string().required("Email is required"),
+  loggedFor: Yup.string().required().length(24).label("Logged on behalf of"),
+  department: Yup.string().required().label("Department"),
+  //   assignedTo: Yup.string().required("Email is required"),
+});
+
+const initialValues = {
+  issue: "",
+  //   loggedBy: "",
+  loggedFor: "",
+  department: "",
+  //   assignedTo: "",
+};
 
 export default class CreateTicket extends Component {
   constructor(props) {
     super(props);
-
-    // Setting up functions
-    this.onChangeAnimalName = this.onChangeAnimalName.bind(this);
-    this.onChangeAnimalSpecies = this.onChangeAnimalSpecies.bind(this);
-    this.onChangeAnimalBreed = this.onChangeAnimalBreed.bind(this);
-    this.onChangeAnimalAge = this.onChangeAnimalAge.bind(this);
-    this.onChangeAnimalColour = this.onChangeAnimalColour.bind(this);
-
-    this.onSubmit = this.onSubmit.bind(this);
-
-    // Setting up state
     this.state = {
-      name: "",
-      species: "",
-      breed: "",
-      age: "",
-      colour: "",
+      loading: true,
+      users: [],
     };
   }
 
-  onChangeAnimalName(e) {
-    this.setState({ name: e.target.value });
-  }
-
-  onChangeAnimalSpecies(e) {
-    this.setState({ species: e.target.value });
-  }
-
-  onChangeAnimalBreed(e) {
-    this.setState({ breed: e.target.value });
-  }
-
-  onChangeAnimalAge(e) {
-    this.setState({ age: e.target.value });
-  }
-
-  onChangeAnimalColour(e) {
-    this.setState({ colour: e.target.value });
-  }
-
-  onSubmit(e) {
-    e.preventDefault();
-
-    console.log("Animal Successfully Created");
-    console.log(`Name: ${this.state.name}`);
-    console.log(`Species: ${this.state.species}`);
-    console.log(`Breed: ${this.state.breed}`);
-    console.log(`Age: ${this.state.age}`);
-    console.log(`Colour: ${this.state.colour}`);
-
-    axios
-      .post(settings.apiUrl + "/animals/create-animal", this.state)
-      .then((res) => console.log("Logging response", res.data));
-
-    this.setState({
-      name: "",
-      species: "",
-      breed: "",
-      age: "",
-      colour: "",
+  componentDidMount() {
+    axios.get(settings.apiUrl + "/users").then((res) => {
+      this.setState({
+        users: res.data,
+        loading: false,
+      });
     });
   }
 
   render() {
-    return (
-      <div className="form-wrapper">
-        <Form onSubmit={this.onSubmit}>
-          <Form.Group controlId="Name">
-            <Form.Label>Name</Form.Label>
-            <Form.Control
-              type="text"
-              value={this.state.name}
-              onChange={this.onChangeAnimalName}
-            />
-          </Form.Group>
+    return !this.state.loading ? (
+      <Formik
+        initialValues={initialValues}
+        validationSchema={createTicketSchema}
+        onSubmit={(values) => {
+          console.log(values);
+          axios.post(settings.apiUrl + "tickets", { ticket: values });
+        }}
+      >
+        {(formik) => {
+          const { errors, touched, isValid, dirty } = formik;
+          return (
+            <div className="form-container">
+              <h1>Create Ticket</h1>
+              <Form>
+                <FormField
+                  errors={errors}
+                  touched={touched}
+                  name="issue"
+                  label="Issue"
+                  as="textarea"
+                />
 
-          <Form.Group controlId="Species">
-            <Form.Label>Species</Form.Label>
-            <Form.Control
-              type="text"
-              value={this.state.species}
-              onChange={this.onChangeAnimalSpecies}
-            />
-          </Form.Group>
+                <FormField
+                  errors={errors}
+                  touched={touched}
+                  name="department"
+                  label="Department"
+                />
 
-          <Form.Group controlId="Breed">
-            <Form.Label>Breed</Form.Label>
-            <Form.Control
-              type="text"
-              value={this.state.breed}
-              onChange={this.onChangeAnimalBreed}
-            />
-          </Form.Group>
+                <FormField
+                  errors={errors}
+                  touched={touched}
+                  name="loggedFor"
+                  label="Logged on behalf of"
+                  as="select"
+                >
+                  <option>Select a user</option>
+                  {this.state.users.map((user) => (
+                    <option value={user._id}>{user.email}</option>
+                  ))}
+                </FormField>
 
-          <Form.Group controlId="Age">
-            <Form.Label>Age</Form.Label>
-            <Form.Control
-              type="number"
-              value={this.state.age}
-              onChange={this.onChangeAnimalAge}
-            />
-          </Form.Group>
-
-          <Form.Group controlId="Colour">
-            <Form.Label>Colour</Form.Label>
-            <Form.Control
-              type="text"
-              value={this.state.colour}
-              onChange={this.onChangeAnimalColour}
-            />
-          </Form.Group>
-
-          <Button variant="danger" size="lg" block="block" type="submit">
-            Create Animal
-          </Button>
-        </Form>
-      </div>
+                <FormButton title="Create Ticket" dirty isValid />
+              </Form>
+            </div>
+          );
+        }}
+      </Formik>
+    ) : (
+      <div>Loading...</div>
     );
   }
 }
