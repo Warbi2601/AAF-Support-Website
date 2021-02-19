@@ -15,7 +15,7 @@ const columns = [
     name: "Date Logged",
     selector: "dateLogged",
     sortable: true,
-    cell: (row) => <div>{moment(row).format("DD/MM/YYYY")}</div>,
+    cell: (row) => <div>{moment(row.dateLogged).format("DD/MM/YYYY")}</div>,
   },
   {
     name: "Logged By",
@@ -24,8 +24,11 @@ const columns = [
   },
   {
     name: "Logged For",
-    selector: "loggedFor.email",
+    selector: "loggedFor",
     sortable: true,
+    cell: (row) => (
+      <div>{row.loggedFor?.email || <span className="error">N/A</span>}</div>
+    ),
   },
   {
     name: "Department",
@@ -34,8 +37,11 @@ const columns = [
   },
   {
     name: "Assigned To",
-    selector: "assignedTo.email",
+    selector: "assignedTo",
     sortable: true,
+    cell: (row) => (
+      <div>{row.assignedTo?.email || <span className="error">N/A</span>}</div>
+    ),
   },
 ];
 

@@ -5,9 +5,11 @@ function FormField({
   errors,
   touched,
   name,
+  children,
   label = name,
   as = "input",
-  children,
+  isSubmitting = false,
+  disabled = false,
 }) {
   //   console.log("EERORS" + name, errors);
   //   console.log("TOUCHED" + name, touched);
@@ -19,6 +21,7 @@ function FormField({
         name={name}
         id={name}
         className={errors[name] && touched[name] ? "input-error" : null}
+        disabled={isSubmitting || disabled}
       >
         {children}
       </Field>

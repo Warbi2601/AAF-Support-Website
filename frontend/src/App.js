@@ -6,9 +6,11 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import "bootstrap/dist/css/bootstrap.css";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
-// import axios from "axios";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import "./App.css";
+import "./styles/site.scss";
 import CreateAnimal from "./components/CreateAnimal";
 import EditAnimal from "./components/EditAnimal";
 import Home from "./components/Home";
@@ -53,6 +55,17 @@ function App() {
 
   return (
     <UserContext.Provider value={providerValue}>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       <Router>
         <div className="App">
           <header className="App-header">

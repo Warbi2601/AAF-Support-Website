@@ -1,15 +1,16 @@
 const Ticket = require("../models/ticket.model");
 
 exports.addTicket = (req, res) => {
-  //   const { email, password,  } = req.body;
-  //   const user = new User({ email, password });
-  const ticket = new Ticket(req.body);
+  //need to possibly assign the ticket here
+  const obj = req.body;
+  obj.loggedBy = req.userID;
+  const ticket = new Ticket(obj);
   ticket.save(function (err) {
     if (err) {
       console.log(err);
       res.status(500).send("Error logging your ticket, try again.");
     } else {
-      res.status(200).send("Ticket successfully added");
+      res.status(200).send("Ticket successfully added!");
     }
   });
 };

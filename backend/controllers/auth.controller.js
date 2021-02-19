@@ -16,7 +16,7 @@ exports.register = (req, res) => {
       res.status(500).send("Error registering your account, try again.");
     } else {
       // Issue token
-      const payload = { email };
+      const payload = { email, _id: user._id };
       const token = jwt.sign(payload, secret, {
         expiresIn: "1h",
       });
@@ -49,7 +49,7 @@ exports.login = (req, res) => {
           });
         } else {
           // Issue token
-          const payload = { email };
+          const payload = { email, _id: user._id };
           const token = jwt.sign(payload, secret, {
             expiresIn: "1h",
           });

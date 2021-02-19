@@ -5,12 +5,16 @@ const ticketSchema = new Schema(
   {
     issue: {
       type: String,
+      required: true,
     },
     dateLogged: {
       type: Date,
+      required: true,
+      default: Date.now,
     },
     loggedBy: {
       type: Schema.Types.ObjectId,
+      required: true,
       ref: "User",
     },
     loggedFor: {
@@ -19,6 +23,7 @@ const ticketSchema = new Schema(
     },
     department: {
       type: String,
+      required: true,
     },
     assignedTo: {
       type: Schema.Types.ObjectId,
