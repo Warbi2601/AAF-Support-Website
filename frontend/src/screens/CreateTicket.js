@@ -39,7 +39,6 @@ export default class CreateTicket extends Component {
       this.setState({
         users: res.data,
         loading: false,
-        formSubmitting: false,
         error: "",
       });
     });
@@ -52,25 +51,22 @@ export default class CreateTicket extends Component {
         validationSchema={createTicketSchema}
         onSubmit={(values, { resetForm }) => {
           if (values.loggedFor === "") delete values.loggedFor;
-          this.setState({ formSubmitting: true });
-          setTimeout(() => {
-            axios
-              .post(settings.apiUrl + "/tickets", values)
-              .then((res) => {
-                this.setState({ formSubmitting: false });
-                resetForm();
-                toast.success(res.data);
-              })
-              .catch((err) => {
-                this.setState({ formSubmitting: false });
-                //   toast.error(`${err.response.statusText} - ${err.response.data}`);
-                toast.error(err.response.data);
-              });
-          }, 5000);
+          // setTimeout(() => {
+          axios
+            .post(settings.apiUrl + "/tickets", values)
+            .then((res) => {
+              resetForm();
+              toast.success(res.data);
+            })
+            .catch((err) => {
+              //   toast.error(`${err.response.statusText} - ${err.response.data}`);
+              toast.error(err.response.data);
+            });
+          // }, 5000);
         }}
       >
         {(formik) => {
-          const { errors, touched, isValid, dirty } = formik;
+          const { errors, touched, isValid, dirty, isSubmitting } = formik;
           return (
             <div>
               {this.state.error && <p>Error: {this.state.error}</p>}
@@ -78,29 +74,29 @@ export default class CreateTicket extends Component {
                 <h1>Create Ticket</h1>
                 <Form>
                   <FormField
-                    errors={errors}
-                    touched={touched}
+                    errors={errors} // Ignore
+                    touched={touched} // Ignore
+                    isSubmitting={isSubmitting} // Ignore
                     name="issue"
                     label="Issue"
                     as="textarea"
-                    isSubmitting={this.state.formSubmitting}
                   />
 
                   <FormField
-                    errors={errors}
-                    touched={touched}
+                    errors={errors} // Ignore
+                    touched={touched} // Ignore
+                    isSubmitting={isSubmitting} // Ignore
                     name="department"
                     label="Department"
-                    isSubmitting={this.state.formSubmitting}
                   />
 
                   <FormField
-                    errors={errors}
-                    touched={touched}
+                    errors={errors} // Ignore
+                    touched={touched} // Ignore
+                    isSubmitting={isSubmitting} // Ignore
                     name="loggedFor"
                     label="Logged on behalf of"
                     as="select"
-                    isSubmitting={this.state.formSubmitting}
                   >
                     <option value="">Select a user</option>
                     {this.state.users.map((user) => (
@@ -110,9 +106,9 @@ export default class CreateTicket extends Component {
 
                   <FormButton
                     title="Create Ticket"
-                    dirty={dirty}
-                    isValid={isValid}
-                    isSubmitting={this.state.formSubmitting}
+                    dirty={dirty} // Ignore
+                    isValid={isValid} // Ignore
+                    isSubmitting={isSubmitting} // Ignore
                   />
                 </Form>
               </div>

@@ -3,3 +3,8 @@ $colorDanger: #ca0b00;
 .error {
   color: $colorDanger;
 }
+
+//needed to fix datatable bug
+.iRVWcQ {
+  overflow: initial !important;
+}

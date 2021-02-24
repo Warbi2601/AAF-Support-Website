@@ -4,6 +4,7 @@ exports.addTicket = (req, res) => {
   //need to possibly assign the ticket here
   const obj = req.body;
   obj.loggedBy = req.userID;
+  obj.status = 0; // Sets status to created
   const ticket = new Ticket(obj);
   ticket.save(function (err) {
     if (err) {

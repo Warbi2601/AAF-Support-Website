@@ -3,6 +3,7 @@ import React, { Component } from "react";
 import moment from "moment";
 import { UserContext } from "../context/UserContext";
 import settings from "../settings/settings";
+import utility from "../utility/utility";
 
 export default class TicketDetails extends Component {
   static contextType = UserContext;
@@ -27,6 +28,7 @@ export default class TicketDetails extends Component {
         <p>Logged For: {data.loggedFor?.email}</p>
         <p>Department: {data.department}</p>
         <p>Assigned To: {data.assignedTo?.email}</p>
+        <p>Status: {utility.statusToString(data.status)}</p>
       </div>
     ) : (
       <div>

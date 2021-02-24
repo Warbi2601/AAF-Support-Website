@@ -1,30 +1,29 @@
 import axios from "axios";
 import React, { Component } from "react";
-import settings from "../settings/settings";
-import DataTable from "react-data-table-component";
-import ArrowDownward from "@material-ui/icons/ArrowDownward";
 import moment from "moment";
+import settings from "../settings/settings";
+import Table from "../components/Table";
+import utility from "../utility/utility";
 
 const columns = [
   {
     name: "Issue",
-    selector: "issue",
+    selector: (row) => row.issue,
     sortable: true,
   },
   {
     name: "Date Logged",
-    selector: "dateLogged",
+    selector: (row) => moment(row.dateLogged).format("DD/MM/YYYY"),
     sortable: true,
-    cell: (row) => <div>{moment(row.dateLogged).format("DD/MM/YYYY")}</div>,
   },
   {
     name: "Logged By",
-    selector: "loggedBy.email",
+    selector: (row) => row.loggedBy.email,
     sortable: true,
   },
   {
     name: "Logged For",
-    selector: "loggedFor",
+    selector: (row) => row.loggedFor,
     sortable: true,
     cell: (row) => (
       <div>{row.loggedFor?.email || <span className="error">N/A</span>}</div>
@@ -32,16 +31,21 @@ const columns = [
   },
   {
     name: "Department",
-    selector: "department",
+    selector: (row) => row.department,
     sortable: true,
   },
   {
     name: "Assigned To",
-    selector: "assignedTo",
+    selector: (row) => row.assignedTo,
     sortable: true,
     cell: (row) => (
       <div>{row.assignedTo?.email || <span className="error">N/A</span>}</div>
     ),
+  },
+  {
+    name: "Status",
+    selector: (row) => utility.statusToString(row.status),
+    sortable: true,
   },
 ];
 
@@ -57,50 +61,19 @@ export default class Tickets extends Component {
 
   render() {
     let data = this.state.tickets || [];
-    console.log("Tickets", data);
-    return !this.state.loading ? (
-      <>
-        {/* <div
-         style={{
-           flexDirection: "column",
-           alignItems: "center",
-           justifyContent: "center",
-         }}
-       >
-         <p>{this.state.error}</p>
-         <h2>Animal List</h2>
-         <Table striped bordered hover>
-           <thead>
-             <tr>
-               <th>Name</th>
-               <th>Species</th>
-               <th>Breed</th>
-               <th>Age</th>
-               <th>Colour</th>
-               <th>Delete</th>
-             </tr>
-           </thead>
-           <tbody>{data}</tbody>
-         </Table>
-       </div> */}
+    return (
+      <div>
         <p>{this.state.error}</p>
 
-        <DataTable
+        <Table
           title="Tickets"
           columns={columns}
           data={data}
-          pagination={true}
-          sortIcon={<ArrowDownward />}
-          progressPending={data.length < 1}
           onRowClicked={(item) => {
             this.props.history.push("/ticket-details/" + item._id);
             console.log(item);
           }}
         />
-      </>
-    ) : (
-      <div>
-        <p>Loading Tickets...</p>
       </div>
     );
   }

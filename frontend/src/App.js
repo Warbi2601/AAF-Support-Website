@@ -35,6 +35,18 @@ function App() {
 
   // D:\Uni\Year3\AppsAndFrameworks\Week11\mongodb-win32-x86_64-windows-4.4.2/bin/mongod.exe --dbpath D:\Uni\Year3\AppsAndFrameworks\Week11\Testing-Start\data --nojournal
 
+  //   axios.interceptors.response.use((response) => {
+  //     return response;
+  // }, function (error) {
+  //     // Do something with response error
+  //     if (error.response.status === 401) {
+  //         console.log('unauthorized, logging out ...');
+  //         auth.logout();
+  //         router.replace('/auth/login');
+  //     }
+  //     return Promise.reject(error.response);
+  // });
+
   const [user, setUser] = useState(null);
 
   const providerValue = useMemo(() => ({ user, setUser }), [user, setUser]);
