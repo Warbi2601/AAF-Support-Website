@@ -1,7 +1,24 @@
 import React, { Component } from "react";
-import settings from "../settings/settings";
 import axios from "axios";
+import settings from "../settings/settings";
+import { Formik, Form } from "formik";
+import * as Yup from "yup";
+import { toast } from "react-toastify";
+
+import "../styles/Form.scss";
+import FormField from "../components/forms/FormField";
+import FormButton from "../components/forms/FormButton";
 import { UserContext } from "../context/UserContext";
+
+const loginSchema = Yup.object().shape({
+  email: Yup.string().required().email().label("Email"),
+  password: Yup.string().required().label("Password"),
+});
+
+const initialValues = {
+  email: "",
+  password: "",
+};
 
 export default class Login extends Component {
   static contextType = UserContext;
@@ -14,54 +31,74 @@ export default class Login extends Component {
     };
   }
 
-  handleInputChange = (event) => {
-    const { value, name } = event.target;
-    this.setState({
-      [name]: value,
-    });
-  };
-
-  onSubmit = (event) => {
-    event.preventDefault();
-    axios
-      .post(settings.authUrl + "/login", this.state)
+  onSubmit = async (values) => {
+    await axios
+      .post(settings.authUrl + "/login", values)
       .then((res) => {
-        if (res.status === 200) {
-          this.context.setUser(res.data);
-          this.props.history.push("/");
-        } else {
-          const error = new Error(res.error);
-          throw error;
-        }
+        this.context.setUser(res.data);
+        this.props.history.push("/");
       })
       .catch((err) => {
         console.error(err);
-        alert("Error logging in please try again");
+        toast.error("Error logging in please try again");
       });
   };
 
   render() {
     return (
-      <form onSubmit={this.onSubmit}>
-        <h1>Login Below!</h1>
-        <input
-          type="email"
-          name="email"
-          placeholder="Enter email"
-          value={this.state.email}
-          onChange={this.handleInputChange}
-          required
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Enter password"
-          value={this.state.password}
-          onChange={this.handleInputChange}
-          required
-        />
-        <input type="submit" value="Submit" />
-      </form>
+      <Formik
+        initialValues={initialValues}
+        validationSchema={loginSchema}
+        onSubmit={this.onSubmit}
+      >
+        {(formik) => {
+          const { errors, touched, isValid, dirty, isSubmitting } = formik;
+          return (
+            <div>
+              <div className="form-container">
+                <h1>Register</h1>
+                <Form>
+                  <FormField
+                    formik={formik}
+                    name="email"
+                    label="Email"
+                    type="email"
+                  />
+
+                  <FormField
+                    formik={formik}
+                    name="password"
+                    label="Password"
+                    type="password"
+                  />
+
+                  <FormButton title="Login" formik={formik} />
+                </Form>
+              </div>
+            </div>
+          );
+        }}
+      </Formik>
+      // <form onSubmit={this.onSubmit}>
+      //   <h1>Login Below!</h1>
+      //   <input
+      //     type="email"
+      //     name="email"
+      //     placeholder="Enter email"
+      //     value={this.state.email}
+      //     onChange={this.handleInputChange}
+      //     required
+      //   />
+      //   <input
+      //     type="password"
+      //     name="password"
+      //     placeholder="Enter password"
+      //     value={this.state.password}
+      //     onChange={this.handleInputChange}
+      //     required
+      //   />
+      //   <input type="submit" value="Submit" />
+      // </form>
     );
   }
 }

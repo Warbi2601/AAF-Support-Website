@@ -49,10 +49,10 @@ export default class CreateTicket extends Component {
       <Formik
         initialValues={initialValues}
         validationSchema={createTicketSchema}
-        onSubmit={(values, { resetForm }) => {
+        onSubmit={async (values, { resetForm }) => {
           if (values.loggedFor === "") delete values.loggedFor;
           // setTimeout(() => {
-          axios
+          await axios
             .post(settings.apiUrl + "/tickets", values)
             .then((res) => {
               resetForm();

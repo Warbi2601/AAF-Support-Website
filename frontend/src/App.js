@@ -160,7 +160,7 @@ function App() {
                     <Route
                       exact
                       path="/create-ticket"
-                      component={CreateTicket}
+                      component={WithAuth(CreateTicket)}
                     />
                     <Route
                       exact

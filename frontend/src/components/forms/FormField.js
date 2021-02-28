@@ -11,7 +11,7 @@ function FormField({
   as = "input",
   // isSubmitting = false,
   disabled = false,
-  inputType,
+  ...otherProps
 }) {
   //   console.log("EERORS" + name, errors);
   //   console.log("TOUCHED" + name, touched);
@@ -26,7 +26,8 @@ function FormField({
           formik.errors[name] && formik.touched[name] ? "input-error" : null
         }
         disabled={formik.isSubmitting || disabled}
-        type={inputType}
+        placeholder={label || ""}
+        {...otherProps}
       >
         {children}
       </Field>

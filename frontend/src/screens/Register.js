@@ -56,8 +56,6 @@ export default class Register extends Component {
       >
         {(formik) => {
           const { errors, touched, isValid, dirty, isSubmitting } = formik;
-          console.log("FORMIK", formik);
-          console.log("isSubmitting", isSubmitting);
           return (
             <div>
               <div className="form-container">
@@ -67,21 +65,21 @@ export default class Register extends Component {
                     formik={formik}
                     name="email"
                     label="Email"
-                    inputType="email"
+                    type="email"
                   />
 
                   <FormField
                     formik={formik}
                     name="password"
                     label="Password"
-                    inputType="password"
+                    type="password"
                   />
 
                   <FormField
                     formik={formik}
                     name="confirmPassword"
                     label="Confirm Password"
-                    inputType="password"
+                    type="password"
                   />
 
                   <FormField
