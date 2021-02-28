@@ -74,26 +74,20 @@ export default class CreateTicket extends Component {
                 <h1>Create Ticket</h1>
                 <Form>
                   <FormField
-                    errors={errors} // Ignore
-                    touched={touched} // Ignore
-                    isSubmitting={isSubmitting} // Ignore
+                    formik={formik}
                     name="issue"
                     label="Issue"
                     as="textarea"
                   />
 
                   <FormField
-                    errors={errors} // Ignore
-                    touched={touched} // Ignore
-                    isSubmitting={isSubmitting} // Ignore
+                    formik={formik}
                     name="department"
                     label="Department"
                   />
 
                   <FormField
-                    errors={errors} // Ignore
-                    touched={touched} // Ignore
-                    isSubmitting={isSubmitting} // Ignore
+                    formik={formik}
                     name="loggedFor"
                     label="Logged on behalf of"
                     as="select"
@@ -104,12 +98,7 @@ export default class CreateTicket extends Component {
                     ))}
                   </FormField>
 
-                  <FormButton
-                    title="Create Ticket"
-                    dirty={dirty} // Ignore
-                    isValid={isValid} // Ignore
-                    isSubmitting={isSubmitting} // Ignore
-                  />
+                  <FormButton title="Create Ticket" formik={formik} />
                 </Form>
               </div>
             </div>
