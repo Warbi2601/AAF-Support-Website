@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const withAuth = require("../middleware");
+const { withAuth } = require("../middleware");
 
 router.use("/tickets", withAuth, require("./ticket.routes"));
 router.use("/users", withAuth, require("./user.routes"));

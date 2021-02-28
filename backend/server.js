@@ -4,8 +4,7 @@ let cors = require("cors");
 let bodyParser = require("body-parser");
 let dbConfig = require("./config/db.config");
 const cookieParser = require("cookie-parser");
-const User = require("./models/user.model");
-const jwt = require("jsonwebtoken");
+const middleware = require("./middleware");
 const createError = require("http-errors");
 var logger = require("morgan");
 require("dotenv").config();
@@ -37,6 +36,8 @@ app.use(
 app.use(cookieParser());
 app.use(cors());
 app.use(logger("dev"));
+
+app.use(middleware.setLocalUser);
 
 app.use("/api", require("./routes/api.routes")); //Main Router -- For authed users only
 app.use("/auth", require("./routes/auth.routes")); //Auth Router

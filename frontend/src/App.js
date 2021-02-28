@@ -11,8 +11,6 @@ import "react-toastify/dist/ReactToastify.css";
 
 import "./App.css";
 import "./styles/site.scss";
-import CreateAnimal from "./components/CreateAnimal";
-import EditAnimal from "./components/EditAnimal";
 import Home from "./components/Home";
 import Secret from "./components/Secret";
 import WithAuth from "./components/WithAuth";

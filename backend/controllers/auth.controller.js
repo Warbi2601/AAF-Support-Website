@@ -11,7 +11,7 @@ exports.register = async (req, res) => {
     role: role || "user",
   });
 
-  user.save(function (err) {
+  user.save(async function (err) {
     if (err) {
       console.log(err);
       if (err.errors?.email) res.status(400).send("Email already taken");
@@ -25,7 +25,14 @@ exports.register = async (req, res) => {
       //save token to db and return it
       user.accessToken = token;
       await user.save();
-      res.cookie("token", token, { httpOnly: true }).sendStatus(200);
+      res
+        .cookie("token", token, { httpOnly: true })
+        .status(200)
+        // .json({
+        //   data: { email: user.email, role: user.role },
+        //   accessToken
+        //  })
+        .send("Registered successfully");
     }
   });
 };
@@ -43,7 +50,7 @@ exports.login = (req, res) => {
         error: "Incorrect email or password",
       });
     } else {
-      user.isCorrectPassword(password, function (err, same) {
+      user.isCorrectPassword(password, async function (err, same) {
         if (err) {
           res.status(500).json({
             error: "Internal error please try again",
@@ -59,8 +66,8 @@ exports.login = (req, res) => {
             expiresIn: "1h",
           });
 
-          User.findOneAndUpdate(user._id, { accessToken: token });
-
+          user.accessToken = token;
+          user.save();
           //removes the password from the return object
           const { password, ...restOfUser } = user._doc;
 

@@ -81,6 +81,7 @@ export default class Register extends Component {
                     formik={formik}
                     name="confirmPassword"
                     label="Confirm Password"
+                    inputType="password"
                   />
 
                   <FormField
