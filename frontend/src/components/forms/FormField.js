@@ -13,8 +13,6 @@ function FormField({
   disabled = false,
   ...otherProps
 }) {
-  //   console.log("EERORS" + name, errors);
-  //   console.log("TOUCHED" + name, touched);
   return (
     <div className="form-row">
       <label htmlFor={name}>{label}</label>

@@ -38,6 +38,7 @@ exports.register = async (req, res) => {
 };
 
 exports.login = (req, res) => {
+  // setTimeout(() => {
   const { email, password } = req.body;
   User.findOne({ email }, function (err, user) {
     if (err) {
@@ -63,7 +64,7 @@ exports.login = (req, res) => {
           // Issue token
           const payload = { email, _id: user._id };
           const token = jwt.sign(payload, process.env.JWT_SECRET, {
-            expiresIn: "1h",
+            expiresIn: "1d",
           });
 
           user.accessToken = token;
@@ -80,6 +81,7 @@ exports.login = (req, res) => {
       });
     }
   });
+  // }, 10000);
 };
 
 exports.checkToken = (req, res) => {

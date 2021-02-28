@@ -8,3 +8,23 @@ $colorDanger: #ca0b00;
 .iRVWcQ {
   overflow: initial !important;
 }
+
+.globalLoader {
+  .loader {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: "flex";
+    justify-content: "center";
+    align-items: "center";
+    cursor: "wait";
+  }
+
+  .loaderBackground {
+    background-color: grey;
+    opacity: 0.3;
+    border-radius: 15px;
+  }
+}

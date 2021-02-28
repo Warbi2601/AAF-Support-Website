@@ -26,6 +26,7 @@ import settings from "./settings/settings";
 import { UserContext } from "./context/UserContext";
 import Logout from "./screens/Logout";
 import CheckAuth from "./screens/CheckAuth";
+import LoadingIndicator from "./components/Loader/LoadingIndicator";
 
 function App() {
   // axios.defaults.headers.common["x-access-token"] = "HELLO";
@@ -76,6 +77,7 @@ function App() {
         draggable
         pauseOnHover
       />
+
       <Router>
         <div className="App">
           <header className="App-header">
@@ -181,6 +183,7 @@ function App() {
           </Container>
         </div>
       </Router>
+      <LoadingIndicator />
     </UserContext.Provider>
   );
 }

@@ -2,7 +2,7 @@ import React from "react";
 import ArrowDownward from "@material-ui/icons/ArrowDownward";
 import DataTable from "react-data-table-component";
 
-import Loader from "./Loader";
+import Loader from "./Loader/Loader";
 
 function Table({
   keyField = "_id",
