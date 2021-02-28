@@ -1,11 +1,15 @@
 import React from "react";
 
-function FormButton({ title, dirty, isValid, isSubmitting = false }) {
+function FormButton({ title, formik }) {
   return (
     <button
       type="submit"
-      className={!(dirty && isValid) || isSubmitting ? "disabled-btn" : ""}
-      disabled={!(dirty && isValid) || isSubmitting}
+      className={
+        !(formik.dirty && formik.isValid) || formik.isSubmitting
+          ? "disabled-btn"
+          : ""
+      }
+      disabled={!(formik.dirty && formik.isValid) || formik.isSubmitting}
     >
       {title}
     </button>

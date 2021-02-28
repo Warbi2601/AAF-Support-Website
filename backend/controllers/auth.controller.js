@@ -1,25 +1,30 @@
 const User = require("../models/user.model");
 const jwt = require("jsonwebtoken");
 
-// needs abstracting into an environment variable
-const secret = "aaf2021secret";
-
-exports.register = (req, res) => {
-  const { email, password } = req.body;
+exports.register = async (req, res) => {
+  const { email, password, firstName, lastName, role } = req.body;
   const user = new User({
     email,
     password,
+    firstName,
+    lastName,
+    role: role || "user",
   });
+
   user.save(function (err) {
     if (err) {
       console.log(err);
+      if (err.errors?.email) res.status(400).send("Email already taken");
       res.status(500).send("Error registering your account, try again.");
     } else {
       // Issue token
       const payload = { email, _id: user._id };
-      const token = jwt.sign(payload, secret, {
-        expiresIn: "1h",
+      const token = jwt.sign(payload, process.env.JWT_SECRET, {
+        expiresIn: "1d",
       });
+      //save token to db and return it
+      user.accessToken = token;
+      await user.save();
       res.cookie("token", token, { httpOnly: true }).sendStatus(200);
     }
   });
@@ -50,9 +55,11 @@ exports.login = (req, res) => {
         } else {
           // Issue token
           const payload = { email, _id: user._id };
-          const token = jwt.sign(payload, secret, {
+          const token = jwt.sign(payload, process.env.JWT_SECRET, {
             expiresIn: "1h",
           });
+
+          User.findOneAndUpdate(user._id, { accessToken: token });
 
           //removes the password from the return object
           const { password, ...restOfUser } = user._doc;

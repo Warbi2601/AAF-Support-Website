@@ -8,8 +8,7 @@ const User = require("./models/user.model");
 const jwt = require("jsonwebtoken");
 const createError = require("http-errors");
 var logger = require("morgan");
-
-const secret = "aaf2021secret";
+require("dotenv").config();
 
 // Connecting Database
 mongoose.Promise = global.Promise;

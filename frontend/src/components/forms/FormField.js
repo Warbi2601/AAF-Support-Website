@@ -2,14 +2,16 @@ import React from "react";
 import { Field, ErrorMessage } from "formik";
 
 function FormField({
-  errors,
-  touched,
+  // errors,
+  // touched,
+  formik,
   name,
   children,
   label = name,
   as = "input",
-  isSubmitting = false,
+  // isSubmitting = false,
   disabled = false,
+  inputType,
 }) {
   //   console.log("EERORS" + name, errors);
   //   console.log("TOUCHED" + name, touched);
@@ -20,8 +22,11 @@ function FormField({
         as={as}
         name={name}
         id={name}
-        className={errors[name] && touched[name] ? "input-error" : null}
-        disabled={isSubmitting || disabled}
+        className={
+          formik.errors[name] && formik.touched[name] ? "input-error" : null
+        }
+        disabled={formik.isSubmitting || disabled}
+        type={inputType}
       >
         {children}
       </Field>

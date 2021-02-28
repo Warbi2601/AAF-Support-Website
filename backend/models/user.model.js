@@ -1,13 +1,22 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-
 const bcrypt = require("bcrypt");
-
+const uniqueValidator = require("mongoose-unique-validator");
 const saltRounds = 10;
 
 const UserSchema = new Schema({
-  email: { type: String, required: true, unique: true },
+  email: { type: String, required: true, unique: true, trim: true },
   password: { type: String, required: true },
+  firstName: { type: String, required: true },
+  lastName: { type: String, required: true },
+  role: {
+    type: String,
+    default: "user",
+    enum: ["user", "admin", "agent"],
+  },
+  accessToken: {
+    type: String,
+  },
 });
 
 UserSchema.pre("save", function (next) {
@@ -36,4 +45,5 @@ UserSchema.methods.isCorrectPassword = function (password, callback) {
   });
 };
 
+UserSchema.plugin(uniqueValidator);
 module.exports = mongoose.model("User", UserSchema);
