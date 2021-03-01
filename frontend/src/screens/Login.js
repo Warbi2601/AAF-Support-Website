@@ -5,6 +5,7 @@ import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
 import { trackPromise } from "react-promise-tracker";
+import { Link } from "react-router-dom";
 
 import "../styles/Form.scss";
 import FormField from "../components/forms/FormField";
@@ -51,60 +52,45 @@ export default class Login extends Component {
 
   render() {
     return (
-      <Formik
-        initialValues={initialValues}
-        validationSchema={loginSchema}
-        onSubmit={this.onSubmit}
-      >
-        {(formik) => {
-          const { errors, touched, isValid, dirty, isSubmitting } = formik;
-          return (
-            <div>
-              <div className="form-container">
-                <h1>Login</h1>
-                <Form>
-                  <FormField
-                    formik={formik}
-                    name="email"
-                    label="Email"
-                    type="email"
-                  />
+      <div className="login-form">
+        <Formik
+          initialValues={initialValues}
+          validationSchema={loginSchema}
+          onSubmit={this.onSubmit}
+        >
+          {(formik) => {
+            const { errors, touched, isValid, dirty, isSubmitting } = formik;
+            return (
+              <div>
+                <div className="form-container">
+                  <h1>Login</h1>
+                  <Form>
+                    <FormField
+                      formik={formik}
+                      name="email"
+                      label="Email"
+                      type="email"
+                    />
 
-                  <FormField
-                    formik={formik}
-                    name="password"
-                    label="Password"
-                    type="password"
-                  />
+                    <FormField
+                      formik={formik}
+                      name="password"
+                      label="Password"
+                      type="password"
+                    />
 
-                  <FormButton title="Login" formik={formik} />
-                </Form>
+                    <FormButton title="Login" formik={formik} />
+                    <p className="forgot-password text-right">
+                      Not got an account? <Link to={"/register"}>Sign up</Link>
+                    </p>
+                  </Form>
+                </div>
+                <LoadingIndicator area="login-area" />
               </div>
-              <LoadingIndicator area="login-area" />
-            </div>
-          );
-        }}
-      </Formik>
-      // <form onSubmit={this.onSubmit}>
-      //   <h1>Login Below!</h1>
-      //   <input
-      //     type="email"
-      //     name="email"
-      //     placeholder="Enter email"
-      //     value={this.state.email}
-      //     onChange={this.handleInputChange}
-      //     required
-      //   />
-      //   <input
-      //     type="password"
-      //     name="password"
-      //     placeholder="Enter password"
-      //     value={this.state.password}
-      //     onChange={this.handleInputChange}
-      //     required
-      //   />
-      //   <input type="submit" value="Submit" />
-      // </form>
+            );
+          }}
+        </Formik>
+      </div>
     );
   }
 }

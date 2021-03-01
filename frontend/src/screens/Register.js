@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import "../styles/Form.scss";
 import FormField from "../components/forms/FormField";
 import FormButton from "../components/forms/FormButton";
+import { Link } from "react-router-dom";
 
 const registerSchema = Yup.object().shape({
   email: Yup.string().required().email().label("Email"),
@@ -95,32 +96,15 @@ export default class Register extends Component {
                   />
 
                   <FormButton title="Register" formik={formik} />
+                  <p className="forgot-password text-right">
+                    Already got an account? <Link to={"/login"}>Login</Link>
+                  </p>
                 </Form>
               </div>
             </div>
           );
         }}
       </Formik>
-      // <form onSubmit={this.onSubmit}>
-      //   <h1>Register</h1>
-      //   <input
-      //     type="email"
-      //     name="email"
-      //     placeholder="Enter email"
-      //     value={this.state.email}
-      //     onChange={this.handleInputChange}
-      //     required
-      //   />
-      //   <input
-      //     type="password"
-      //     name="password"
-      //     placeholder="Enter password"
-      //     value={this.state.password}
-      //     onChange={this.handleInputChange}
-      //     required
-      //   />
-      //   <input type="submit" value="Submit" />
-      // </form>
     );
   }
 }
