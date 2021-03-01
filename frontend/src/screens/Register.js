@@ -9,13 +9,15 @@ import "../styles/Form.scss";
 import FormField from "../components/forms/FormField";
 import FormButton from "../components/forms/FormButton";
 import { Link } from "react-router-dom";
+import LoadingIndicator from "../components/Loader/LoadingIndicator";
+import { trackPromise } from "react-promise-tracker";
 
 const registerSchema = Yup.object().shape({
   email: Yup.string().required().email().label("Email"),
-  password: Yup.string().required().length(6).label("Password"),
+  password: Yup.string().required().min(6).label("Password"),
   confirmPassword: Yup.string()
     .required()
-    .length(6)
+    .min(6)
     .oneOf([Yup.ref("password"), null], "Passwords must match")
     .label("Confirm Password"),
   firstName: Yup.string().required().label("First Name"),
@@ -36,16 +38,19 @@ export default class Register extends Component {
   }
 
   onSubmit = async (values) => {
-    await axios
-      .post(settings.authUrl + "/register", values)
-      .then((res) => {
-        // resetForm();
-        this.props.history.push("/");
-        toast.success(res.data);
-      })
-      .catch((err) => {
-        toast.error(err.response.data);
-      });
+    trackPromise(
+      axios
+        .post(settings.authUrl + "/register", values)
+        .then((res) => {
+          // resetForm();
+          this.props.history.push("/");
+          toast.success(res.data);
+        })
+        .catch((err) => {
+          toast.error(err.response.data);
+        }),
+      "register-area"
+    );
   };
 
   render() {
@@ -58,48 +63,51 @@ export default class Register extends Component {
         {(formik) => {
           const { errors, touched, isValid, dirty, isSubmitting } = formik;
           return (
-            <div>
-              <div className="form-container">
-                <h1>Register</h1>
-                <Form>
-                  <FormField
-                    formik={formik}
-                    name="email"
-                    label="Email"
-                    type="email"
-                  />
+            <div className="login-spacing">
+              <div className="login-container">
+                <div className="form-container">
+                  <h1>Register</h1>
+                  <Form>
+                    <FormField
+                      formik={formik}
+                      name="email"
+                      label="Email"
+                      type="email"
+                    />
 
-                  <FormField
-                    formik={formik}
-                    name="password"
-                    label="Password"
-                    type="password"
-                  />
+                    <FormField
+                      formik={formik}
+                      name="password"
+                      label="Password"
+                      type="password"
+                    />
 
-                  <FormField
-                    formik={formik}
-                    name="confirmPassword"
-                    label="Confirm Password"
-                    type="password"
-                  />
+                    <FormField
+                      formik={formik}
+                      name="confirmPassword"
+                      label="Confirm Password"
+                      type="password"
+                    />
 
-                  <FormField
-                    formik={formik}
-                    name="firstName"
-                    label="First Name"
-                  />
+                    <FormField
+                      formik={formik}
+                      name="firstName"
+                      label="First Name"
+                    />
 
-                  <FormField
-                    formik={formik}
-                    name="lastName"
-                    label="Last Name"
-                  />
+                    <FormField
+                      formik={formik}
+                      name="lastName"
+                      label="Last Name"
+                    />
 
-                  <FormButton title="Register" formik={formik} />
-                  <p className="forgot-password text-right">
-                    Already got an account? <Link to={"/login"}>Login</Link>
-                  </p>
-                </Form>
+                    <FormButton title="Register" formik={formik} />
+                    <p className="forgot-password text-right">
+                      Already got an account? <Link to={"/login"}>Login</Link>
+                    </p>
+                  </Form>
+                </div>
+                <LoadingIndicator area="register-area" />
               </div>
             </div>
           );

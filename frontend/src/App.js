@@ -123,12 +123,6 @@ function App() {
                   </Nav>
 
                   <Nav>
-                    <Link to={"/edit-animal/:id"} className="nav-link">
-                      Edit Animal
-                    </Link>
-                  </Nav>
-
-                  <Nav>
                     <Link to={"/tickets"} className="nav-link">
                       Tickets
                     </Link>

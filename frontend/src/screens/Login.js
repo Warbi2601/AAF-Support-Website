@@ -8,6 +8,7 @@ import { trackPromise } from "react-promise-tracker";
 import { Link } from "react-router-dom";
 
 import "../styles/Form.scss";
+import "../styles/Login.scss";
 import FormField from "../components/forms/FormField";
 import FormButton from "../components/forms/FormButton";
 import { UserContext } from "../context/UserContext";
@@ -52,18 +53,19 @@ export default class Login extends Component {
 
   render() {
     return (
-      <div className="login-form">
-        <Formik
-          initialValues={initialValues}
-          validationSchema={loginSchema}
-          onSubmit={this.onSubmit}
-        >
-          {(formik) => {
-            const { errors, touched, isValid, dirty, isSubmitting } = formik;
-            return (
-              <div>
+      <Formik
+        initialValues={initialValues}
+        validationSchema={loginSchema}
+        onSubmit={this.onSubmit}
+      >
+        {(formik) => {
+          const { errors, touched, isValid, dirty, isSubmitting } = formik;
+          return (
+            <div className="login-spacing">
+              <div className="login-container">
                 <div className="form-container">
                   <h1>Login</h1>
+                  <hr />
                   <Form>
                     <FormField
                       formik={formik}
@@ -87,10 +89,10 @@ export default class Login extends Component {
                 </div>
                 <LoadingIndicator area="login-area" />
               </div>
-            );
-          }}
-        </Formik>
-      </div>
+            </div>
+          );
+        }}
+      </Formik>
     );
   }
 }

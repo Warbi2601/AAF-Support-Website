@@ -1,0 +1,29 @@
+$text-color: #3d6098;
+
+.login-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  position: relative;
+  margin: auto;
+  width: 30rem;
+  background-color: #e7e7e7;
+  border-radius: 15px;
+  box-shadow: -2px 2px 11px 2px black;
+
+  .forgot-password {
+    font-size: 0.8rem;
+    color: $text-color;
+  }
+
+  h1,
+  label {
+    color: $text-color;
+  }
+}
+
+.login-spacing {
+  margin-top: 5%;
+  margin-bottom: 5%;
+}

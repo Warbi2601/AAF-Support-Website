@@ -1,5 +1,38 @@
 $colorDanger: #ca0b00;
 
+$base-bgcolor: #213159;
+$base-color: #e7e7e7;
+$base-btn-color: #f04b4c;
+
+$base-font-weight: 300;
+$base-font-size: 1rem;
+$base-line-height: 1.5;
+$base-font-family: Helvetica Neue;
+$base-font-family-fallback: sans-serif;
+
+html,
+body,
+#root,
+.App {
+  height: 100%;
+  font: $base-font-weight #{$base-font-size}/#{$base-line-height}
+      $base-font-family,
+    $base-font-family-fallback;
+  background-color: $base-bgcolor;
+  color: $base-color;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+input:focus {
+  outline: none;
+  transition: transform 0.15s ease;
+  transform: scale(1.01);
+}
+
 .error {
   color: $colorDanger;
 }
@@ -16,15 +49,24 @@ $colorDanger: #ca0b00;
     position: absolute;
     top: 0;
     left: 0;
-    display: "flex";
-    justify-content: "center";
-    align-items: "center";
-    cursor: "wait";
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: wait;
   }
 
   .loaderBackground {
     background-color: grey;
     opacity: 0.3;
     border-radius: 15px;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
   }
+}
+
+.wrapper {
+  margin: 30px 0;
 }

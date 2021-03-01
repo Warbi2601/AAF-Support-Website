@@ -13,9 +13,9 @@ const defaultOptions = {
 
 function Loader({ height = 200, width = 200 }) {
   return (
-    <div>
-      <Lottie options={defaultOptions} height={height} width={width} />
-    </div>
+    // <div>
+    <Lottie options={defaultOptions} height={height} width={width} />
+    // </div>
   );
 }
 
