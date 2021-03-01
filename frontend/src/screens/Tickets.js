@@ -6,6 +6,9 @@ import settings from "../settings/settings";
 import Table from "../components/Table";
 import utility from "../utility/utility";
 import LoadingIndicator from "../components/Loader/LoadingIndicator";
+import { toast } from "react-toastify";
+import Modal from "../components/Modal";
+import CreateTicket from "./CreateTicket";
 
 const columns = [
   {
@@ -57,15 +60,44 @@ export default class Tickets extends Component {
     this.state = {
       tickets: [],
       loading: true,
-      error: null,
+      modalOpen: false,
     };
   }
+
+  showModal = () => {
+    this.setState({ modalOpen: true });
+  };
+
+  hideModal = () => {
+    this.setState({ modalOpen: false });
+  };
 
   render() {
     let data = this.state.tickets || [];
     return (
       <div>
-        <p>{this.state.error}</p>
+        <button onClick={this.showModal} className="btn-default">
+          Create Ticket
+        </button>
+
+        <Modal
+          title="Create Ticket"
+          BodyComponent={() => <CreateTicket history={this.props.history} />}
+          onHide={this.hideModal}
+          show={this.state.modalOpen}
+          loaderName={"create-ticket-area"}
+        />
+
+        {/* <Modal show={this.state.modalOpen} onHide={this.hideModal}>
+          <Modal.Header>
+            <Modal.Title>Hi</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>The body</Modal.Body>
+          <Modal.Footer>
+            <button onClick={this.hideModal}>Cancel</button>
+            <button>Save</button>
+          </Modal.Footer>
+        </Modal> */}
 
         <Table
           title="Tickets"
@@ -81,25 +113,29 @@ export default class Tickets extends Component {
   }
 
   componentDidMount() {
-    const onDelete = (itemToDelete) => {
-      console.log(itemToDelete._id);
+    // const onDelete = (itemToDelete) => {
+    //   console.log(itemToDelete._id);
 
-      axios
-        .delete(settings.apiUrl + "/animals/delete-animal/" + itemToDelete._id)
-        .then((res) => {
-          if (res.error) this.setState({ error: res.error });
+    //   axios
+    //     .delete(settings.apiUrl + "/animals/delete-animal/" + itemToDelete._id)
+    //     .then((res) => {
+    //       if (res.error) this.setState({ error: res.error });
 
-          this.setState({
-            tickets: this.state.tickets.filter(
-              (item) => item.props._id !== itemToDelete._id
-            ),
-          });
-        });
-    };
+    //       this.setState({
+    //         tickets: this.state.tickets.filter(
+    //           (item) => item.props._id !== itemToDelete._id
+    //         ),
+    //       });
+    //     });
+    // };
 
-    axios.get(settings.apiUrl + "/tickets").then((res) => {
-      if (res.error) this.setState({ error: res.error });
-      this.setState({ tickets: res.data, loading: false });
-    });
+    axios
+      .get(settings.apiUrl + "/tickets")
+      .then((res) => {
+        this.setState({ tickets: res.data, loading: false });
+      })
+      .catch((err) => {
+        toast.error(err.response.data.error);
+      });
   }
 }

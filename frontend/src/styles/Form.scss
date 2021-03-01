@@ -1,7 +1,8 @@
 $primary-color: #1d3557;
+$secondary-color: #3d6098;
 $error-color: #e63946;
 $bg-color: #f1faee;
-$text-color: #e7e7e7;
+$text-color: $secondary-color;
 $input-color: #000000;
 $color-white: #fff;
 $color-green: #8fffab;
@@ -60,6 +61,7 @@ $border-radius: 15px;
     padding: 0.5rem 1rem;
     padding-left: 1rem;
     font-size: 1rem;
+    color: $text-color;
   }
 
   textarea {

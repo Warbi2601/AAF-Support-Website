@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import "../styles/Form.scss";
 import FormField from "../components/forms/FormField";
 import FormButton from "../components/forms/FormButton";
+import { trackPromise } from "react-promise-tracker";
 
 const createTicketSchema = Yup.object().shape({
   issue: Yup.string().required().label("Issue"),
@@ -39,7 +40,6 @@ export default class CreateTicket extends Component {
       this.setState({
         users: res.data,
         loading: false,
-        error: "",
       });
     });
   }
@@ -52,16 +52,19 @@ export default class CreateTicket extends Component {
         onSubmit={async (values, { resetForm }) => {
           if (values.loggedFor === "") delete values.loggedFor;
           // setTimeout(() => {
-          await axios
-            .post(settings.apiUrl + "/tickets", values)
-            .then((res) => {
-              resetForm();
-              toast.success(res.data);
-            })
-            .catch((err) => {
-              //   toast.error(`${err.response.statusText} - ${err.response.data}`);
-              toast.error(err.response.data);
-            });
+          trackPromise(
+            axios
+              .post(settings.apiUrl + "/tickets", values)
+              .then((res) => {
+                resetForm();
+                toast.success(res.data.success);
+                this.props.history.push("/ticket-details/" + res.data.ticketID);
+              })
+              .catch((err) => {
+                toast.error(err.response.data.error);
+              }),
+            "create-ticket-area"
+          );
           // }, 5000);
         }}
       >
@@ -69,9 +72,7 @@ export default class CreateTicket extends Component {
           const { errors, touched, isValid, dirty, isSubmitting } = formik;
           return (
             <div>
-              {this.state.error && <p>Error: {this.state.error}</p>}
               <div className="form-container">
-                <h1>Create Ticket</h1>
                 <Form>
                   <FormField
                     formik={formik}
@@ -97,6 +98,8 @@ export default class CreateTicket extends Component {
                       <option value={user._id}>{user.email}</option>
                     ))}
                   </FormField>
+
+                  <hr />
 
                   <FormButton title="Create Ticket" formik={formik} />
                 </Form>
