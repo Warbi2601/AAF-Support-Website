@@ -12,7 +12,7 @@ import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 import "./styles/site.scss";
 import Home from "./components/Home";
-import Secret from "./components/Secret";
+// import Secret from "./components/Secret";
 import WithAuth from "./components/WithAuth";
 import Lobby from "./components/chat/Lobby";
 import Room from "./components/chat/Room";
@@ -45,6 +45,17 @@ function App() {
   //     }
   //     return Promise.reject(error.response);
   // });
+
+  // axios.interceptors.response.use(
+  //   function (response) {
+  //     if (response.data.success) toast.success(response.data.success);
+  //     return response;
+  //   },
+  //   function (error) {
+  //     if (error.response.data.error) toast.error(error.response.data.error);
+  //     return Promise.reject(error);
+  //   }
+  // );
 
   const [user, setUser] = useState(null);
 
@@ -89,11 +100,11 @@ function App() {
                       Home
                     </Link>
                   </Nav>
-                  <Nav>
+                  {/* <Nav>
                     <Link to={"/secret"} className="nav-link">
                       Secret
                     </Link>
-                  </Nav>
+                  </Nav> */}
 
                   {!user && (
                     <Nav>
@@ -116,11 +127,11 @@ function App() {
                       </Link>
                     </Nav>
                   )}
-                  <Nav>
+                  {/* <Nav>
                     <Link to={"/create-ticket"} className="nav-link">
                       Create Ticket
                     </Link>
-                  </Nav>
+                  </Nav> */}
 
                   <Nav>
                     <Link to={"/tickets"} className="nav-link">
@@ -149,7 +160,7 @@ function App() {
                       path="/check-auth"
                       component={WithAuth(CheckAuth)}
                     />
-                    <Route exact path="/secret" component={WithAuth(Secret)} />
+                    {/* <Route exact path="/secret" component={WithAuth(Secret)} /> */}
                     <Route exact path="/login" component={Login} />
                     <Route exact path="/logout" component={WithAuth(Logout)} />
                     <Route exact path="/register" component={Register} />
@@ -168,8 +179,8 @@ function App() {
                       path="/ticket-details/:id"
                       component={WithAuth(TicketDetails)}
                     />
-                    <Route path="/chatLobby" component={Lobby} />
-                    <Route path="/room/:roomId" component={Room} />
+                    <Route path="/chatLobby" component={WithAuth(Lobby)} />
+                    <Route path="/room/:roomId" component={WithAuth(Room)} />
                   </Switch>
                 </div>
               </Col>

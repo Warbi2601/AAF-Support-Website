@@ -1,6 +1,7 @@
 const Ticket = require("../models/ticket.model");
 
 exports.addTicket = (req, res) => {
+  // setTimeout(() => {
   //need to possibly assign the ticket here
   const obj = req.body;
   obj.loggedBy = req.userID;
@@ -11,9 +12,13 @@ exports.addTicket = (req, res) => {
       console.log(err);
       res.status(500).send("Error logging your ticket, try again.");
     } else {
-      res.status(200).send("Ticket successfully added!");
+      res.status(200).json({
+        success: "Ticket successfully added!",
+        ticketID: ticket._id,
+      });
     }
   });
+  // }, 10000);
 };
 
 exports.getTicket = (req, res) => {

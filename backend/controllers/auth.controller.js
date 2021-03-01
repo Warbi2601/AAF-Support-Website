@@ -8,7 +8,7 @@ exports.register = async (req, res) => {
     password,
     firstName,
     lastName,
-    role: role || "user",
+    role: role || "client",
   });
 
   user.save(async function (err) {
