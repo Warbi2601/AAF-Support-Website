@@ -9,6 +9,7 @@ import LoadingIndicator from "../components/Loader/LoadingIndicator";
 import { toast } from "react-toastify";
 import Modal from "../components/Modal";
 import CreateTicket from "./CreateTicket";
+import formatting from "../utility/formatting";
 
 const columns = [
   {
@@ -18,7 +19,7 @@ const columns = [
   },
   {
     name: "Date Logged",
-    selector: (row) => moment(row.dateLogged).format("DD/MM/YYYY"),
+    selector: (row) => moment(row.dateLogged).format(formatting.dateTimeFormat),
     sortable: true,
   },
   {

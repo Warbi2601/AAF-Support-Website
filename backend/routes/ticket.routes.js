@@ -13,7 +13,7 @@ router.post(
   controller.addTicket
 );
 
-// router.put("/", controller.updateTicket);
+router.put("/", controller.updateTicket);
 
 // router.delete("/", controller.deleteTicket);
 

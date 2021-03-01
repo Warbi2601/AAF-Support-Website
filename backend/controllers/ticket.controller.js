@@ -39,7 +39,6 @@ exports.getTicket = (req, res) => {
 };
 
 exports.getAllTickets = (req, res) => {
-  console.log("Get all tickets called");
   Ticket.find()
     .populate("loggedBy")
     .populate("loggedFor")
@@ -52,4 +51,38 @@ exports.getAllTickets = (req, res) => {
         message: err.message || "An error occurred while retrieving Tickets.",
       });
     });
+};
+
+exports.updateTicket = async (req, res) => {
+  try {
+    const { ticket, action } = req.body;
+    const user = res.locals.loggedInUser;
+    ticket.statusHistory.push({
+      date: new Date(),
+      action: action,
+      userName: `${user.firstName} ${user.lastName} (${user.email})`,
+    });
+
+    const updatedTicket = await Ticket.findOneAndUpdate(
+      { _id: ticket._id },
+      ticket,
+      // If `new` isn't true, `findOneAndUpdate()` will return the
+      // document as it was _before_ it was updated.
+      { new: true }
+    );
+
+    // If the function returns null then it didnt update
+    if (!updatedTicket)
+      res.status(500).json({
+        error: "Something went wrong when updating the ticket",
+      });
+
+    res.status(200).json({
+      success: "Ticket Updated",
+    });
+  } catch (err) {
+    res.status(500).json({
+      error: "Something went wrong when updating the ticket",
+    });
+  }
 };

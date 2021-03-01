@@ -1,30 +1,76 @@
-const statusToString = (status) => {
-  switch (status) {
+const statusToString = (statusID) => {
+  switch (statusID) {
     case 0:
       return "Open";
     case 1:
-      return "Opened on behalf of another user";
+      return "Closed";
     case 2:
-      return "Allocated to support";
-    case 2:
-      return "Suspended";
+      return "In Progress";
     case 3:
       return "Resolved";
     case 4:
-      return "Cancelled";
+      return "Suspended";
     case 5:
+      return "Cancelled";
+    case 6:
       return "Expired";
     default:
       return "";
   }
 };
 
-const getActionsForRole = (role) => {
-  if (!role) return [];
-  return getAllActions(role).find((action) => action.role === role);
+const getStatusFromString = (statusString) => {
+  switch (statusString) {
+    case "Open":
+      return 0;
+    case "Closed":
+      return 1;
+    case "In Progress":
+      return 2;
+    case "Resolved":
+      return 3;
+    case "Suspended":
+      return 4;
+    case "Cancelled":
+      return 5;
+    case "Expired":
+      return 6;
+  }
 };
 
-const getAllActions = (role) => {
+const statusNextAction = (statusID) => {
+  switch (statusID) {
+    case 0:
+      return "Open";
+    case 1:
+      return "Closed";
+    case 2:
+      return "In Progress";
+    case 3:
+      return "Resolved";
+    case 4:
+      return "Suspended";
+    case 5:
+      return "Cancelled";
+    case 6:
+      return "Expired";
+  }
+};
+
+const getActionsForRole = (role) => {
+  if (!role) return [];
+  return getAllActions().find((action) => action.role === role);
+};
+
+const getActionByID = (id) => {
+  if (!id) return {};
+  const actions = getAllActions();
+  return actions
+    .find((role) => role.actions.find((action) => action.order === id))
+    .actions.find((action) => action.order === id);
+};
+
+const getAllActions = () => {
   const actions = [
     {
       role: "client",
@@ -32,22 +78,27 @@ const getAllActions = (role) => {
         {
           order: 1,
           name: "Open Ticket",
+          // fnString: "openTicket",
         },
         {
           order: 8,
           name: "Reopen Ticket",
+          fnString: "reopenTicket",
         },
         {
           order: 10,
           name: "Add more information",
+          fnString: "addMoreInfo",
         },
         {
           order: 11,
           name: "Close Ticket",
+          fnString: "closeTicket",
         },
         {
           order: 14,
           name: "Cancel Ticket by user",
+          fnString: "cancelTicketByUser",
         },
       ],
     },
@@ -109,5 +160,7 @@ const getAllActions = (role) => {
 
 export default {
   statusToString,
+  getStatusFromString,
   getActionsForRole,
+  getActionByID,
 };
