@@ -15,7 +15,7 @@ router.post(
 
 // Open Ticket on behalf // Will be POST
 
-router.put("/", controller.updateTicket);
+router.put("/", controller.updateTicket); //will be removed when all other routes have been implemented
 
 //Client
 router.put("/reopen-ticket", controller.updateTicket);
