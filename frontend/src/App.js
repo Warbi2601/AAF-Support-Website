@@ -13,7 +13,8 @@ import "./App.css";
 import "./styles/site.scss";
 import Home from "./components/Home";
 // import Secret from "./components/Secret";
-import WithAuth from "./components/WithAuth";
+import WithAuth from "./components/filters/WithAuth";
+import AlreadyAuthed from "./components/filters/AlreadyAuthed";
 import Lobby from "./components/chat/Lobby";
 import Room from "./components/chat/Room";
 import Login from "./screens/Login";
@@ -146,6 +147,10 @@ function App() {
                 </Nav>
               </Container>
             </Navbar>
+            {/* @todo Remove this debugger */}
+            <p style={{ fontSize: "10px", margin: 0 }}>
+              {user && `Logged in as ${user?.role}`}
+            </p>
           </header>
 
           <Container>
@@ -161,9 +166,17 @@ function App() {
                       component={WithAuth(CheckAuth)}
                     />
                     {/* <Route exact path="/secret" component={WithAuth(Secret)} /> */}
-                    <Route exact path="/login" component={Login} />
+                    <Route
+                      exact
+                      path="/login"
+                      component={AlreadyAuthed(Login)}
+                    />
                     <Route exact path="/logout" component={WithAuth(Logout)} />
-                    <Route exact path="/register" component={Register} />
+                    <Route
+                      exact
+                      path="/register"
+                      component={AlreadyAuthed(Register)}
+                    />
                     <Route
                       exact
                       path="/create-ticket"

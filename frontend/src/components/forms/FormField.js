@@ -15,7 +15,7 @@ function FormField({
 }) {
   return (
     <div className="form-row">
-      <label htmlFor={name}>{label}</label>
+      {!otherProps.hidden && <label htmlFor={name}>{label}</label>}
       <Field
         as={as}
         name={name}

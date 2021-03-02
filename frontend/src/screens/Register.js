@@ -11,6 +11,7 @@ import FormButton from "../components/forms/FormButton";
 import { Link } from "react-router-dom";
 import LoadingIndicator from "../components/Loader/LoadingIndicator";
 import { trackPromise } from "react-promise-tracker";
+import { UserContext } from "../context/UserContext";
 
 const registerSchema = Yup.object().shape({
   email: Yup.string().required().email().label("Email"),
@@ -33,6 +34,8 @@ const initialValues = {
 };
 
 export default class Register extends Component {
+  static contextType = UserContext;
+
   constructor(props) {
     super(props);
   }
@@ -42,9 +45,9 @@ export default class Register extends Component {
       axios
         .post(settings.authUrl + "/register", values)
         .then((res) => {
-          // resetForm();
+          this.context.setUser(res.data.user);
           this.props.history.push("/");
-          toast.success(res.data);
+          toast.success(res.data.success);
         })
         .catch((err) => {
           toast.error(err.response.data);

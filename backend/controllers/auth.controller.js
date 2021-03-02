@@ -25,6 +25,10 @@ exports.register = async (req, res) => {
       //save token to db and return it
       user.accessToken = token;
       await user.save();
+
+      //removes the password from the return object
+      const { password, ...restOfUser } = user._doc;
+
       res
         .cookie("token", token, { httpOnly: true })
         .status(200)
@@ -32,7 +36,10 @@ exports.register = async (req, res) => {
         //   data: { email: user.email, role: user.role },
         //   accessToken
         //  })
-        .send("Registered successfully");
+        .json({
+          user: restOfUser,
+          success: "Registered Successfully",
+        });
     }
   });
 };
@@ -68,7 +75,7 @@ exports.login = (req, res) => {
           });
 
           user.accessToken = token;
-          user.save();
+          await user.save();
           //removes the password from the return object
           const { password, ...restOfUser } = user._doc;
 

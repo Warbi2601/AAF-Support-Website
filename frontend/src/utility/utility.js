@@ -75,11 +75,11 @@ const getAllActions = () => {
     {
       role: "client",
       actions: [
-        {
-          order: 1,
-          name: "Open Ticket",
-          // fnString: "openTicket",
-        },
+        // {
+        //   order: 1,
+        //   name: "Open Ticket",
+        //   // fnString: "openTicket", // This is only needed on the view tickets screen
+        // },
         {
           order: 8,
           name: "Reopen Ticket",
@@ -105,10 +105,10 @@ const getAllActions = () => {
     {
       role: "support",
       actions: [
-        {
-          order: 2,
-          name: "Open Ticket on behalf",
-        },
+        // {
+        //   order: 2,
+        //   name: "Open Ticket on behalf", // This is only needed on the view tickets screen
+        // },
         {
           order: 4,
           name: "Allocate to self",

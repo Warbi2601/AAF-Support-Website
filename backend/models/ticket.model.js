@@ -36,6 +36,9 @@ const ticketSchema = new Schema(
     statusHistory: {
       type: [Schema.Types.Mixed],
     },
+    moreInfo: {
+      type: [Schema.Types.Mixed],
+    },
   },
   {
     collection: "tickets",

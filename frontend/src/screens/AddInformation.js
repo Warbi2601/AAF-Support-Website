@@ -7,11 +7,11 @@ import FormField from "../components/forms/FormField";
 import FormButton from "../components/forms/FormButton";
 
 const updateInfoSchema = Yup.object().shape({
-  issue: Yup.string().required().label("Issue"),
+  moreInfo: Yup.string().required().label("More Information"),
 });
 
 const initialValues = {
-  issue: "",
+  moreInfo: "",
 };
 
 export default class CreateTicket extends Component {
@@ -34,14 +34,13 @@ export default class CreateTicket extends Component {
                 <Form>
                   <FormField
                     formik={formik}
-                    name="issue"
-                    label="Issue"
+                    name="moreInfo"
+                    label="More Information"
                     as="textarea"
                   />
-
+                  <FormField formik={formik} name="action" hidden />
                   <hr />
-
-                  <FormButton title="Update Information" formik={formik} />
+                  <FormButton title="Add More Information" formik={formik} />
                 </Form>
               </div>
             </div>
