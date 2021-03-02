@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
-import settings from "../settings/settings";
-import { UserContext } from "../context/UserContext";
+import settings from "../../settings/settings";
+import { UserContext } from "../../context/UserContext";
 import axios from "axios";
 
 export default function withAuth(ComponentToProtect) {
