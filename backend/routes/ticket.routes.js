@@ -3,6 +3,12 @@ const router = express.Router();
 const middleware = require("../middleware");
 const controller = require("../controllers/ticket.controller");
 
+const roleNames = {
+  client: "client",
+  support: "support",
+  admin: "admin",
+};
+
 router.get("/", controller.getAllTickets);
 
 router.get("/:id", controller.getTicket);
@@ -33,7 +39,11 @@ router.put("/cancel-ticket-support", controller.updateTicket);
 router.put("/cancel-abandoned-ticket", controller.updateTicket);
 
 //Admin
-router.put("/allocate-ticket-support", controller.updateTicket);
+router.put(
+  "/allocate-ticket-support",
+  middleware.checkRole(roleNames.admin),
+  controller.updateTicket
+);
 router.put("/close-ticket-expired", controller.updateTicket);
 
 // router.delete("/", controller.deleteTicket);

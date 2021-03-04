@@ -37,9 +37,9 @@ app.use(cookieParser());
 app.use(cors());
 app.use(logger("dev"));
 
-app.use(middleware.setLocalUser);
+// app.use(middleware.setLocalUser);
 
-app.use("/api", require("./routes/api.routes")); //Main Router -- For authed users only
+app.use("/api", middleware.setLocalUser, require("./routes/api.routes")); //Main Router -- For authed users only
 app.use("/auth", require("./routes/auth.routes")); //Auth Router
 
 //Chat Service - start:

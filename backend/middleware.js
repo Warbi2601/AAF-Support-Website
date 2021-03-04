@@ -9,8 +9,6 @@ exports.withAuth = (req, res, next) => {
     req.headers["x-access-token"] ||
     req.cookies.token;
 
-  console.log("Cookies", req.cookies);
-
   if (!token) {
     res.status(401).send("Unauthorized: No token provided");
   } else {
@@ -51,18 +49,41 @@ exports.setLocalUser = async (req, res, next) => {
     req.cookies.token;
 
   if (token) {
-    const { _id, exp } = await jwt.verify(token, process.env.JWT_SECRET);
-    // Check if token has expired
-    if (exp < Date.now().valueOf() / 1000) {
+    try {
+      const { _id, exp } = await jwt.verify(token, process.env.JWT_SECRET);
+
+      // Check if token has expired
+      if (exp < Date.now().valueOf() / 1000) {
+        return res.status(401).json({
+          error: "JWT token has expired, please login to obtain a new one",
+        });
+      }
+      res.locals.loggedInUser = await User.findById(_id);
+    } catch (error) {
       return res.status(401).json({
-        error: "JWT token has expired, please login to obtain a new one",
+        error: "JWT token not valid, please login to obtain a new one",
       });
     }
-    res.locals.loggedInUser = await User.findById(_id);
     next();
   } else {
     next();
   }
+};
+
+exports.checkRole = (roleName) => {
+  return async (req, res, next) => {
+    try {
+      const user = res.locals.loggedInUser;
+      if (user.role !== roleName) {
+        return res.status(403).json({
+          error: "You don't have the correct permission to perform this action",
+        });
+      }
+      next();
+    } catch (error) {
+      next(error);
+    }
+  };
 };
 
 // module.exports = withAuth;

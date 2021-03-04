@@ -39,7 +39,14 @@ exports.getTicket = (req, res) => {
 };
 
 exports.getAllTickets = (req, res) => {
-  Ticket.find()
+  const user = res.locals.loggedInUser;
+
+  let filter =
+    user.role === "client"
+      ? { $or: [{ loggedBy: user._id }, { loggedFor: user._id }] }
+      : {};
+
+  Ticket.find(filter)
     .populate("loggedBy")
     .populate("loggedFor")
     .populate("assignedTo")
