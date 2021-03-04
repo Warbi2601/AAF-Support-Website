@@ -89,6 +89,9 @@ export default class Tickets extends Component {
           loaderName={"create-ticket-area"}
         />
 
+        <br />
+        <br />
+
         {/* <Modal show={this.state.modalOpen} onHide={this.hideModal}>
           <Modal.Header>
             <Modal.Title>Hi</Modal.Title>
