@@ -24,6 +24,7 @@ export default class TicketDetails extends Component {
       ticket: {},
       addMoreInfoModalOpen: false,
       addInfoComponent: null,
+      actions: [],
     };
   }
 
@@ -61,13 +62,36 @@ export default class TicketDetails extends Component {
             ticket: res.data,
           });
         })
+        .catch((err) => {
+          console.log(err);
+          toast.error("Error getting ticket");
+        })
     );
+  };
+
+  getPermissions = () => {
+    // trackPromise(
+    axios
+      .get(settings.apiUrl + "/rolePermissions")
+      .then((res) => {
+        this.setState({
+          actions: res.data,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Error getting user permissions");
+      });
+    // );
   };
 
   updateTicket = (ticket, action, successMessage) => {
     trackPromise(
       axios
-        .put(settings.apiUrl + "/tickets", { ticket, action })
+        .put(`${settings.apiUrl}/tickets/${this.state.ticket._id}`, {
+          ticket,
+          action,
+        })
         .then(() => {
           this.getTicket();
           toast.success(successMessage);
@@ -131,10 +155,13 @@ export default class TicketDetails extends Component {
     const user = this.context.user;
     const userName = user ? `${user?.firstName} ${user?.lastName}` : "";
 
+    console.dir("actions", this.state.actions);
+
     const columns = [
       {
         name: "Action",
-        selector: (row) => utility.getActionByID(row.action)?.name,
+        selector: (row) =>
+          utility.getActionByID(this.state.actions, row.action)?.name,
         sortable: true,
       },
       {
@@ -181,18 +208,19 @@ export default class TicketDetails extends Component {
               </>
             )}
 
-            {utility.getActionsForRole(user?.role).actions.map((action) => (
-              <button
-                onClick={() => {
-                  let fn = this[action.fnString]; //get function from string
-                  if (typeof fn === "function") fn(action.order); // belt and braces, check its definitely a function in case of future changes
-                }}
-                key={action.order}
-                className="btn-default"
-              >
-                {action.name}
-              </button>
-            ))}
+            {this.state.actions &&
+              this.state.actions.map((action) => (
+                <button
+                  onClick={() => {
+                    let fn = this[action.fnString]; //get function from string
+                    if (typeof fn === "function") fn(action.order); // belt and braces, check its definitely a function in case of future changes
+                  }}
+                  key={action.order}
+                  className="btn-default"
+                >
+                  {action.name}
+                </button>
+              ))}
           </div>
           <div className="col-md-6">
             <h3>Current Status</h3>
@@ -228,5 +256,6 @@ export default class TicketDetails extends Component {
 
   componentDidMount() {
     this.getTicket();
+    this.getPermissions();
   }
 }

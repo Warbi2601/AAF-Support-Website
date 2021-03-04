@@ -6,6 +6,7 @@ const { withAuth } = require("../middleware");
 router.use("/tickets", withAuth, require("./ticket.routes"));
 router.use("/users", withAuth, require("./user.routes"));
 router.use("/animals", withAuth, require("./animal.routes"));
+router.use("/rolePermissions", withAuth, require("./rolePermission.routes"));
 router.use("/home", require("./home.routes"));
 
 module.exports = router;

@@ -1,11 +1,9 @@
 import axios from "axios";
 import React, { Component } from "react";
-import { trackPromise } from "react-promise-tracker";
 import moment from "moment";
 import settings from "../settings/settings";
 import Table from "../components/Table";
 import utility from "../utility/utility";
-import LoadingIndicator from "../components/Loader/LoadingIndicator";
 import { toast } from "react-toastify";
 import Modal from "../components/Modal";
 import CreateTicket from "./CreateTicket";

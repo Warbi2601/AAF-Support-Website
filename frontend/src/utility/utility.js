@@ -1,3 +1,6 @@
+import axios from "axios";
+import settings from "../settings/settings";
+
 const statusToString = (statusID) => {
   switch (statusID) {
     case 0:
@@ -57,29 +60,42 @@ const statusNextAction = (statusID) => {
   }
 };
 
-const getActionsForRole = (role) => {
+const getActionsForRole = async (role) => {
   if (!role) return [];
-  return getAllActions().find((action) => action.role === role);
+  //axios call to get the actions for the role here
+  try {
+    return await axios.get(settings.apiUrl + "/rolePermissions");
+  } catch (error) {
+    console.log("Error getting permissions", error);
+    return [];
+  }
 };
 
-const getActionByID = (id) => {
+const getActionByIDAsync = async (id) => {
   if (!id) return {};
-  const actions = getAllActions();
+  const actions = await getAllActions();
   return actions
     .find((role) => role.actions.find((action) => action.order === id))
     .actions.find((action) => action.order === id);
 };
 
-const getAllActions = () => {
+const getActionByID = (actions, id) => {
+  if (!id || !actions) return {};
+  // return actions
+  //   .find((role) => role.actions.find((action) => action.order === id))
+  //   .actions.find((action) => action.order === id);
+  return actions.find((action) => action.order === id);
+};
+
+const getAllActions = async () => {
   const actions = [
     {
       role: "client",
       actions: [
-        // {
-        //   order: 1,
-        //   name: "Open Ticket",
-        //   // fnString: "openTicket", // This is only needed on the view tickets screen
-        // },
+        {
+          order: 1,
+          name: "Open Ticket",
+        },
         {
           order: 8,
           name: "Reopen Ticket",
@@ -87,7 +103,7 @@ const getAllActions = () => {
         },
         {
           order: 10,
-          name: "Add more information",
+          name: "Add More Information",
           fnString: "addMoreInfo",
         },
         {
@@ -97,7 +113,7 @@ const getAllActions = () => {
         },
         {
           order: 14,
-          name: "Cancel Ticket by user",
+          name: "Cancel Ticket By User",
           fnString: "cancelTicketByUser",
         },
       ],
@@ -105,37 +121,44 @@ const getAllActions = () => {
     {
       role: "support",
       actions: [
-        // {
-        //   order: 2,
-        //   name: "Open Ticket on behalf", // This is only needed on the view tickets screen
-        // },
+        {
+          order: 2,
+          name: "Open Ticket on behalf", // This is only needed on the view tickets screen
+        },
         {
           order: 4,
-          name: "Allocate to self",
+          name: "Allocate to Self",
+          fnString: "allocateToSelf",
         },
         {
           order: 5,
           name: "Check Ticket",
+          fnString: "checkTicket",
         },
         {
           order: 6,
           name: "Reallocate Ticket",
+          fnString: "reallocateTicket",
         },
         {
           order: 7,
           name: "Solve Ticket",
+          fnString: "solveTicket",
         },
         {
           order: 9,
           name: "Suspend Ticket",
+          fnString: "suspendTicket",
         },
         {
           order: 13,
-          name: "Cancel Ticket by support",
+          name: "Cancel Ticket By Support",
+          fnString: "cancelTicketBySupport",
         },
         {
           order: 15,
           name: "Cancel Abandoned Ticket",
+          fnString: "cancelAbandonedTicket",
         },
       ],
     },
@@ -144,13 +167,13 @@ const getAllActions = () => {
       actions: [
         {
           order: 3,
-          name: "Allocate to support",
-          role: "admin",
+          name: "Allocate To Support",
+          fnString: "allocateToSupport",
         },
         {
           order: 12,
           name: "Close Expired Ticket",
-          role: "admin",
+          fnString: "closeExpiredTicket",
         },
       ],
     },
@@ -163,4 +186,6 @@ export default {
   getStatusFromString,
   getActionsForRole,
   getActionByID,
+  getAllActions,
+  getActionByIDAsync,
 };

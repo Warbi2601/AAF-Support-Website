@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("./models/user.model");
 const { roles } = require("./roles");
+const RolePermission = require("./models/rolePermission.model");
 
 exports.withAuth = (req, res, next) => {
   const token =
@@ -63,20 +64,49 @@ exports.grantAccess = (action, resource) => {
 //   }
 // };
 
-exports.checkRole = (roleName) => {
-  return async (req, res, next) => {
-    try {
-      const user = res.locals.loggedInUser;
-      if (user.role !== roleName) {
-        return res.status(403).json({
-          error: "You don't have the correct permission to perform this action",
-        });
-      }
-      next();
-    } catch (error) {
-      next(error);
+exports.checkRole = async (req, res, next) => {
+  try {
+    const { ticket, action } = req.body;
+
+    debugger;
+
+    // request validation to ensure its a clean request
+    if (!action) {
+      res.status(500).json({
+        error: "No update action defined",
+      });
     }
-  };
+
+    if (ticket._id !== req.params.id) {
+      res.status(500).json({
+        error: "The ticket doesn't match the ticket you're trying to update",
+      });
+    }
+
+    const user = res.locals.loggedInUser;
+
+    // get list of actions that this role can perform from the db
+    let permission = await RolePermission.findOne({ role: user.role });
+
+    console.log("PERM", permission);
+
+    let actions = permission.actions;
+
+    let canRunAction = actions
+      ? actions?.some((item) => {
+          return item.order === action;
+        })
+      : false;
+
+    if (!canRunAction) {
+      return res.status(403).json({
+        error: "You don't have the correct permission to perform this action",
+      });
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
 };
 
 // module.exports = withAuth;

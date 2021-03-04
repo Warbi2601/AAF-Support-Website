@@ -63,6 +63,7 @@ exports.getAllTickets = (req, res) => {
 exports.updateTicket = async (req, res) => {
   try {
     const { ticket, action } = req.body;
+
     const user = res.locals.loggedInUser;
     ticket.statusHistory.push({
       date: new Date(),
