@@ -8,37 +8,7 @@ import { toast } from "react-toastify";
 import Modal from "../components/Modal";
 import CreateTicket from "./CreateTicket";
 import formatting from "../utility/formatting";
-
-const columns = [
-  {
-    name: "Name",
-    selector: (row) => `${row.firstName} ${row.lastName}`,
-    sortable: true,
-  },
-  {
-    name: "Email",
-    selector: (row) => row.email,
-    sortable: true,
-  },
-  {
-    name: "Change Password",
-    selector: (row) => <div>click me la</div>,
-    sortable: true,
-  },
-  {
-    name: "Promote User",
-    selector: (row) => <div>click me la</div>,
-    sortable: true,
-  },
-  {
-    name: "Delete",
-    selector: (row) => <div>click me la</div>,
-    sortable: true,
-    // cell: (row) => (
-    //   <div>{row.loggedFor?.email || <span className="error">N/A</span>}</div>
-    // ),
-  },
-];
+import { confirmAlert } from "react-confirm-alert";
 
 export default class AdminCenter extends Component {
   constructor(props) {
@@ -50,12 +20,72 @@ export default class AdminCenter extends Component {
     };
   }
 
+  columns = [
+    {
+      name: "Name",
+      selector: (row) => `${row.firstName} ${row.lastName}`,
+      sortable: true,
+    },
+    {
+      name: "Email",
+      selector: (row) => row.email,
+      sortable: true,
+    },
+    {
+      name: "Edit User",
+      selector: (row) => (
+        <button onClick={this.showModal} className="btn-default">
+          Edit User
+        </button>
+      ),
+      sortable: true,
+    },
+    {
+      name: "Delete User",
+      selector: (row) => (
+        <button onClick={() => this.deleteUser(row)} className="btn-default">
+          Delete
+        </button>
+      ),
+      sortable: true,
+      // cell: (row) => (
+      //   <div>{row.loggedFor?.email || <span className="error">N/A</span>}</div>
+      // ),
+    },
+  ];
+
   showModal = () => {
     this.setState({ modalOpen: true });
   };
 
   hideModal = () => {
     this.setState({ modalOpen: false });
+  };
+
+  deleteUser = (user) => {
+    confirmAlert({
+      title: "Delete User",
+      message:
+        "Are you sure you want to delete this user? All tickets related to this user will be moved to the state of cancelled.",
+      buttons: [
+        {
+          label: "Yes",
+          onClick: () => this.deleteUserConfirm(user),
+        },
+        {
+          label: "No",
+          // onClick: () => alert('Click No')
+        },
+      ],
+    });
+  };
+
+  deleteUserConfirm = (user) => {
+    console.log("DELETE USER", user);
+    axios
+      .delete(settings.apiUrl + "/users/" + user._id)
+      .then((res) => console.log(res))
+      .catch((err) => console.log(err));
   };
 
   render() {
@@ -79,7 +109,7 @@ export default class AdminCenter extends Component {
 
         <Table
           title="Users"
-          columns={columns}
+          columns={this.columns}
           data={data}
           loading={this.state.loading}
           //   onRowClicked={(item) => {

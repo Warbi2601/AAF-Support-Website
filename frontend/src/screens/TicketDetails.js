@@ -4,8 +4,8 @@ import moment from "moment";
 import { toast } from "react-toastify";
 import { trackPromise } from "react-promise-tracker";
 
-import { confirmAlert } from "react-confirm-alert"; // Import
-import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
 
 import { UserContext } from "../context/UserContext";
 import settings from "../settings/settings";
