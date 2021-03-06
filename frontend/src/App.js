@@ -28,6 +28,7 @@ import { UserContext } from "./context/UserContext";
 import Logout from "./screens/Logout";
 import CheckAuth from "./screens/CheckAuth";
 import LoadingIndicator from "./components/Loader/LoadingIndicator";
+import AdminCenter from "./screens/AdminCenter";
 
 function App() {
   // axios.defaults.headers.common["x-access-token"] = "HELLO";
@@ -140,6 +141,11 @@ function App() {
                     </Link>
                   </Nav>
                   <Nav>
+                    <Link to={"/admin-center"} className="nav-link">
+                      Admin Center
+                    </Link>
+                  </Nav>
+                  <Nav>
                     <Link to={"/chatLobby"} className="nav-link">
                       Chat Lobby
                     </Link>
@@ -191,6 +197,11 @@ function App() {
                       exact
                       path="/ticket-details/:id"
                       component={WithAuth(TicketDetails)}
+                    />
+                    <Route
+                      exact
+                      path="/admin-center"
+                      component={WithAuth(AdminCenter)}
                     />
                     <Route path="/chatLobby" component={WithAuth(Lobby)} />
                     <Route path="/room/:roomId" component={WithAuth(Room)} />

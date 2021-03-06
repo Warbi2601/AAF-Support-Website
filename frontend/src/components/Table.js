@@ -24,7 +24,7 @@ function Table({
       highlightOnHover={highlightOnHover}
       // pointerOnHover={pointerOnHover}
       progressComponent={progressComponent}
-      progressPending={props.data.length < 1}
+      // progressPending={props.data.length < 1}
       striped={striped}
       {...props}
     />
