@@ -1,14 +1,17 @@
 import axios from "axios";
 import React, { Component } from "react";
 import moment from "moment";
+import { Edit, Delete } from "@material-ui/icons";
+import { toast } from "react-toastify";
+import { confirmAlert } from "react-confirm-alert";
+
 import settings from "../settings/settings";
 import Table from "../components/Table";
 import utility from "../utility/utility";
-import { toast } from "react-toastify";
 import Modal from "../components/Modal";
 import CreateTicket from "./CreateTicket";
 import formatting from "../utility/formatting";
-import { confirmAlert } from "react-confirm-alert";
+import EditUser from "../components/EditUser";
 
 export default class AdminCenter extends Component {
   constructor(props) {
@@ -17,6 +20,7 @@ export default class AdminCenter extends Component {
       users: [],
       loading: true,
       modalOpen: false,
+      EditComponent: () => <EditUser />,
     };
   }
 
@@ -32,10 +36,25 @@ export default class AdminCenter extends Component {
       sortable: true,
     },
     {
+      name: "Role",
+      selector: (row) => utility.capitalize(row.role),
+      sortable: true,
+    },
+    {
       name: "Edit User",
       selector: (row) => (
-        <button onClick={this.showModal} className="btn-default">
-          Edit User
+        <button
+          onClick={() => {
+            this.setState({
+              EditComponent: () => (
+                <EditUser user={row} hideModal={this.hideModal} />
+              ),
+            });
+            this.showModal();
+          }}
+          className="btn-default btn-sm"
+        >
+          <Edit />
         </button>
       ),
       sortable: true,
@@ -43,8 +62,11 @@ export default class AdminCenter extends Component {
     {
       name: "Delete User",
       selector: (row) => (
-        <button onClick={() => this.deleteUser(row)} className="btn-default">
-          Delete
+        <button
+          onClick={() => this.deleteUser(row)}
+          className="btn-default btn-sm"
+        >
+          <Delete />
         </button>
       ),
       sortable: true,
@@ -84,7 +106,12 @@ export default class AdminCenter extends Component {
     console.log("DELETE USER", user);
     axios
       .delete(settings.apiUrl + "/users/" + user._id)
-      .then((res) => console.log(res))
+      .then((res) => {
+        toast.success(res.data.success);
+        this.setState({
+          users: this.state.users.filter((x) => x._id !== user._id),
+        });
+      })
       .catch((err) => console.log(err));
   };
 
@@ -98,7 +125,7 @@ export default class AdminCenter extends Component {
 
         <Modal
           title="Edit User"
-          BodyComponent={() => <CreateTicket history={this.props.history} />}
+          BodyComponent={this.state.EditComponent}
           onHide={this.hideModal}
           show={this.state.modalOpen}
           loaderName={"edit-user-area"}

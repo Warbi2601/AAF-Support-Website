@@ -86,7 +86,7 @@ exports.updateTicket = async (req, res) => {
       });
 
     res.status(200).json({
-      success: "Ticket Updated",
+      success: "Ticket updated",
     });
   } catch (err) {
     res.status(500).json({

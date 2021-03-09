@@ -64,7 +64,7 @@ export default class Register extends Component {
         onSubmit={this.onSubmit}
       >
         {(formik) => {
-          const { errors, touched, isValid, dirty, isSubmitting } = formik;
+          // const { errors, touched, isValid, dirty, isSubmitting } = formik;
           return (
             <div className="login-spacing">
               <div className="login-container">

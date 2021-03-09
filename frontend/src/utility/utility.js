@@ -87,6 +87,11 @@ const getActionByID = (actions, id) => {
   return actions.find((action) => action.order === id);
 };
 
+const capitalize = (s) => {
+  if (typeof s !== "string") return "";
+  return s.charAt(0).toUpperCase() + s.slice(1);
+};
+
 const getAllActions = async () => {
   const actions = [
     {
@@ -95,26 +100,31 @@ const getAllActions = async () => {
         {
           order: 1,
           name: "Open Ticket",
+          availableActions: [3, 4, 14],
         },
         {
           order: 8,
           name: "Reopen Ticket",
           fnString: "reopenTicket",
+          availableActions: [5],
         },
         {
           order: 10,
           name: "Add More Information",
           fnString: "addMoreInfo",
+          availableActions: [5],
         },
         {
           order: 11,
           name: "Close Ticket",
           fnString: "closeTicket",
+          availableActions: [],
         },
         {
           order: 14,
           name: "Cancel Ticket By User",
           fnString: "cancelTicketByUser",
+          availableActions: [],
         },
       ],
     },
@@ -124,41 +134,49 @@ const getAllActions = async () => {
         {
           order: 2,
           name: "Open Ticket on behalf", // This is only needed on the view tickets screen
+          availableActions: [3, 4, 14],
         },
         {
           order: 4,
           name: "Allocate to Self",
           fnString: "allocateToSelf",
+          availableActions: [5],
         },
         {
           order: 5,
           name: "Check Ticket",
           fnString: "checkTicket",
+          availableActions: [6, 7, 9, 13],
         },
         {
           order: 6,
           name: "Reallocate Ticket",
           fnString: "reallocateTicket",
+          availableActions: [5],
         },
         {
           order: 7,
           name: "Solve Ticket",
           fnString: "solveTicket",
+          availableActions: [11, 12],
         },
         {
           order: 9,
           name: "Suspend Ticket",
           fnString: "suspendTicket",
+          availableActions: [10, 14, 15],
         },
         {
           order: 13,
           name: "Cancel Ticket By Support",
           fnString: "cancelTicketBySupport",
+          availableActions: [],
         },
         {
           order: 15,
           name: "Cancel Abandoned Ticket",
           fnString: "cancelAbandonedTicket",
+          availableActions: [],
         },
       ],
     },
@@ -169,11 +187,13 @@ const getAllActions = async () => {
           order: 3,
           name: "Allocate To Support",
           fnString: "allocateToSupport",
+          availableActions: [5],
         },
         {
           order: 12,
           name: "Close Expired Ticket",
           fnString: "closeExpiredTicket",
+          availableActions: [5],
         },
       ],
     },
@@ -188,4 +208,5 @@ export default {
   getActionByID,
   getAllActions,
   getActionByIDAsync,
+  capitalize,
 };
