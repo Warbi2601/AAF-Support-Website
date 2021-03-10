@@ -33,7 +33,6 @@ export default class EditUser extends Component {
   };
 
   onSubmit = async (values, { resetForm }) => {
-    debugger;
     if (values.password === "") delete values.password;
     if (values.password.length < 6) {
       toast.error("Password needs to be minimum 6 characters");
@@ -43,14 +42,12 @@ export default class EditUser extends Component {
       axios
         .put(`${settings.apiUrl}/users/${this.props.user._id}`, values)
         .then((res) => {
-          debugger;
           resetForm();
           toast.success(res.data.success);
           this.props.hideModal();
           // closeModal
         })
         .catch((err) => {
-          debugger;
           toast.error(err.response.data.error);
         }),
       "edit-user-area"

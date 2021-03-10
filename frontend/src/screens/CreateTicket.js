@@ -10,22 +10,6 @@ import FormField from "../components/forms/FormField";
 import FormButton from "../components/forms/FormButton";
 import { trackPromise } from "react-promise-tracker";
 
-const createTicketSchema = Yup.object().shape({
-  issue: Yup.string().required().label("Issue"),
-  //   loggedBy: Yup.string().required("Email is required"),
-  loggedFor: Yup.string().label("Logged on behalf of"), //.length(24)
-  department: Yup.string().required().label("Department"),
-  //   assignedTo: Yup.string().required("Email is required"),
-});
-
-const initialValues = {
-  issue: "",
-  //   loggedBy: "",
-  loggedFor: "",
-  department: "",
-  //   assignedTo: "",
-};
-
 export default class CreateTicket extends Component {
   constructor(props) {
     super(props);
@@ -45,16 +29,35 @@ export default class CreateTicket extends Component {
   }
 
   render() {
+    const forSelf = this.props.forSelf;
+    const actionID = forSelf ? 1 : 2; // If its the user logging it themseleves its 1, if its on behalf of a user its 2
+
+    const createTicketSchema = Yup.object().shape({
+      issue: Yup.string().required().label("Issue"),
+      loggedFor: forSelf
+        ? Yup.string().label("Logged on behalf of")
+        : Yup.string().required().label("Logged on behalf of"), //make the loggedFor required if its being created by support
+      department: Yup.string().required().label("Department"),
+    });
+
+    const initialValues = {
+      issue: "",
+      loggedFor: "",
+      department: "",
+    };
+
     return !this.state.loading ? (
       <Formik
         initialValues={initialValues}
         validationSchema={createTicketSchema}
         onSubmit={async (values, { resetForm }) => {
           if (values.loggedFor === "") delete values.loggedFor;
-          // setTimeout(() => {
           trackPromise(
             axios
-              .post(settings.apiUrl + "/tickets", values)
+              .post(settings.apiUrl + "/tickets", {
+                ticket: values,
+                action: actionID,
+              })
               .then((res) => {
                 resetForm();
                 toast.success(res.data.success);
@@ -65,7 +68,6 @@ export default class CreateTicket extends Component {
               }),
             "create-ticket-area"
           );
-          // }, 5000);
         }}
       >
         {(formik) => {
@@ -87,18 +89,22 @@ export default class CreateTicket extends Component {
                     label="Department"
                   />
 
-                  <FormField
-                    formik={formik}
-                    name="loggedFor"
-                    label="Logged on behalf of"
-                    as="select"
-                  >
-                    <option value="">Select a user</option>
-                    {this.state.users.map((user) => (
-                      <option value={user._id}>{user.email}</option>
-                    ))}
-                  </FormField>
-
+                  {/* Only show "client"s here as they should be the only ones eligible to have tickets created for them */}
+                  {!forSelf && (
+                    <FormField
+                      formik={formik}
+                      name="loggedFor"
+                      label="Logged on behalf of"
+                      as="select"
+                    >
+                      <option value="">Select a user</option>
+                      {this.state.users.map((user) =>
+                        user.role === "client" ? (
+                          <option value={user._id}>{user.email}</option>
+                        ) : null
+                      )}
+                    </FormField>
+                  )}
                   <hr />
 
                   <FormButton title="Create Ticket" formik={formik} />

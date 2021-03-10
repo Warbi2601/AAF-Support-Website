@@ -4,7 +4,7 @@ import settings from "../../settings/settings";
 import { UserContext } from "../../context/UserContext";
 import axios from "axios";
 
-export default function withAuth(ComponentToProtect) {
+export default function withAuth(ComponentToProtect, role) {
   return class extends Component {
     static contextType = UserContext;
 
@@ -21,8 +21,18 @@ export default function withAuth(ComponentToProtect) {
         .get(settings.authUrl + "/checkToken")
         .then((res) => {
           if (res.status === 200) {
-            //if theres no saved user state but our token is valid, then set it
-            if (!this.context.user) this.context.setUser(res.data);
+            const user = this.context.user;
+
+            //if theres no saved user state but our token is valid, then set it. Also update it if the user role has changed
+            if (!user || user.role !== res.data.role)
+              this.context.setUser(res.data);
+
+            //if the users role doesnt match what weve specified as needing to render this component then protect it
+            if (role && this.context.user.role !== role) {
+              this.failedAuth();
+              return;
+            }
+
             this.setState({ loading: false });
           } else {
             const error = new Error(res.error);
@@ -30,14 +40,19 @@ export default function withAuth(ComponentToProtect) {
           }
         })
         .catch((err) => {
-          if (err?.response.status === 401) {
+          console.log(err);
+          if (err?.response?.status === 401) {
             if (this.context.user) this.context.setUser(null);
           }
 
           console.error("error checking token", err);
-          this.setState({ loading: false, redirect: true });
+          this.failedAuth();
         });
     }
+
+    failedAuth = () => {
+      this.setState({ loading: false, redirect: true });
+    };
 
     render() {
       const { loading, redirect } = this.state;

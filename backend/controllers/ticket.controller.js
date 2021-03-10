@@ -1,24 +1,48 @@
 const Ticket = require("../models/ticket.model");
+const roles = require("../roles");
 
 exports.addTicket = (req, res) => {
-  // setTimeout(() => {
   const user = res.locals.loggedInUser;
-  const obj = req.body;
-  obj.loggedBy = user._id;
-  obj.status = 0; // Sets status to created
-  const ticket = new Ticket(obj);
-  ticket.save(function (err) {
+
+  const { ticket, action } = req.body;
+  ticket.loggedBy = user._id;
+
+  if (user.role === "support" && !ticket.loggedFor) {
+    res
+      .status(400)
+      .send("You need to select a user to create this ticket on behalf of");
+  }
+
+  if (user.role === "client" && ticket.loggedFor) {
+    res.status(400).send("You can't create a ticket on behalf of another user");
+  }
+
+  const actionObj = roles.getActionByID(action);
+
+  ticket.statusHistory = [];
+  ticket.statusHistory.push({
+    date: new Date(),
+    action: actionObj.order,
+    actionName: actionObj.name,
+    user: {
+      _id: user._id,
+      name: `${user.firstName} ${user.lastName} (${user.email})`,
+    },
+    availableActions: actionObj.availableActions,
+  });
+
+  const newTicket = new Ticket(ticket);
+  newTicket.save(function (err) {
     if (err) {
       console.log(err);
       res.status(500).send("Error logging your ticket, try again.");
     } else {
       res.status(200).json({
         success: "Ticket successfully added!",
-        ticketID: ticket._id,
+        ticketID: newTicket._id,
       });
     }
   });
-  // }, 10000);
 };
 
 exports.getTicket = (req, res) => {
@@ -63,12 +87,18 @@ exports.getAllTickets = (req, res) => {
 exports.updateTicket = async (req, res) => {
   try {
     const { ticket, action } = req.body;
-
+    const actionObj = roles.getActionByID(action);
     const user = res.locals.loggedInUser;
+
     ticket.statusHistory.push({
       date: new Date(),
-      action: action,
-      userName: `${user.firstName} ${user.lastName} (${user.email})`,
+      action: actionObj.order,
+      actionName: actionObj.name,
+      user: {
+        _id: user._id,
+        name: `${user.firstName} ${user.lastName} (${user.email})`,
+      },
+      availableActions: actionObj.availableActions,
     });
 
     const updatedTicket = await Ticket.findOneAndUpdate(

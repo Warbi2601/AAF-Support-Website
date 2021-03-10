@@ -1,5 +1,6 @@
 const User = require("../models/user.model");
 const jwt = require("jsonwebtoken");
+const roles = require("../roles");
 
 exports.register = async (req, res) => {
   const { email, password, firstName, lastName, role } = req.body;
@@ -29,17 +30,13 @@ exports.register = async (req, res) => {
       //removes the password from the return object
       const { password, ...restOfUser } = user._doc;
 
-      res
-        .cookie("token", token, { httpOnly: true })
-        .status(200)
-        // .json({
-        //   data: { email: user.email, role: user.role },
-        //   accessToken
-        //  })
-        .json({
-          user: restOfUser,
-          success: "Registered Successfully",
-        });
+      //get updated permissions for users role
+      restOfUser.permissions = roles.getPermissionsForRole(restOfUser.role);
+
+      res.cookie("token", token, { httpOnly: true }).status(200).json({
+        user: restOfUser,
+        success: "Registered Successfully",
+      });
     }
   });
 };
@@ -79,6 +76,9 @@ exports.login = (req, res) => {
           //removes the password from the return object
           const { password, ...restOfUser } = user._doc;
 
+          //get updated permissions for users role
+          restOfUser.permissions = roles.getPermissionsForRole(restOfUser.role);
+
           //returns auth cookie and user object for context
           res
             .cookie("token", token, { httpOnly: true })
@@ -110,6 +110,9 @@ exports.checkToken = (req, res) => {
     } else {
       //removes the password from the return object
       const { password, ...restOfUser } = user._doc;
+
+      //get updated permissions for users role
+      restOfUser.permissions = roles.getPermissionsForRole(restOfUser.role);
 
       //returns auth cookie and user object for context
       res.status(200).json(restOfUser);

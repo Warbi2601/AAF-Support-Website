@@ -141,11 +141,16 @@ function App() {
                       Tickets
                     </Link>
                   </Nav>
-                  <Nav>
-                    <Link to={"/admin-center"} className="nav-link">
-                      Admin Center
-                    </Link>
-                  </Nav>
+
+                  {!user ||
+                    (user.role === "admin" && (
+                      <Nav>
+                        <Link to={"/admin-center"} className="nav-link">
+                          Admin Center
+                        </Link>
+                      </Nav>
+                    ))}
+
                   <Nav>
                     <Link to={"/chatLobby"} className="nav-link">
                       Chat Lobby
@@ -202,7 +207,7 @@ function App() {
                     <Route
                       exact
                       path="/admin-center"
-                      component={WithAuth(AdminCenter)}
+                      component={WithAuth(AdminCenter, "admin")}
                     />
                     <Route path="/chatLobby" component={WithAuth(Lobby)} />
                     <Route path="/room/:roomId" component={WithAuth(Room)} />

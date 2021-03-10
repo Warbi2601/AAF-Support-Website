@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import Modal from "../components/Modal";
 import CreateTicket from "./CreateTicket";
 import formatting from "../utility/formatting";
+import { UserContext } from "../context/UserContext";
 
 const columns = [
   {
@@ -54,6 +55,8 @@ const columns = [
 ];
 
 export default class Tickets extends Component {
+  static contextType = UserContext;
+
   constructor(props) {
     super(props);
     this.state = {
@@ -72,16 +75,23 @@ export default class Tickets extends Component {
   };
 
   render() {
+    if (!this.context.user) return null;
     let data = this.state.tickets || [];
+    const forSelf = this.context.user.role === "client";
+    const createTicketActionName = forSelf
+      ? "Create Ticket"
+      : "Create Ticket For User";
     return (
       <div>
         <button onClick={this.showModal} className="btn-default">
-          Create Ticket
+          {createTicketActionName}
         </button>
 
         <Modal
-          title="Create Ticket"
-          BodyComponent={() => <CreateTicket history={this.props.history} />}
+          title={createTicketActionName}
+          BodyComponent={() => (
+            <CreateTicket history={this.props.history} forSelf={forSelf} />
+          )}
           onHide={this.hideModal}
           show={this.state.modalOpen}
           loaderName={"create-ticket-area"}

@@ -60,17 +60,6 @@ const statusNextAction = (statusID) => {
   }
 };
 
-const getActionsForRole = async (role) => {
-  if (!role) return [];
-  //axios call to get the actions for the role here
-  try {
-    return await axios.get(settings.apiUrl + "/rolePermissions");
-  } catch (error) {
-    console.log("Error getting permissions", error);
-    return [];
-  }
-};
-
 const getActionByIDAsync = async (id) => {
   if (!id) return {};
   const actions = await getAllActions();
@@ -81,10 +70,22 @@ const getActionByIDAsync = async (id) => {
 
 const getActionByID = (actions, id) => {
   if (!id || !actions) return {};
-  // return actions
-  //   .find((role) => role.actions.find((action) => action.order === id))
-  //   .actions.find((action) => action.order === id);
   return actions.find((action) => action.order === id);
+};
+
+const getAvailableActionsForTicket = (allUserActions, lastStatus) => {
+  if (!lastStatus || !lastStatus.availableActions) return {};
+  return allUserActions.filter((action) =>
+    lastStatus.availableActions.some((statusID) => {
+      return statusID === action.order;
+    })
+  );
+};
+
+const getLatestTicketStatusByDate = (statusHistory) => {
+  return statusHistory.reduce((r, a) =>
+    new Date(r.date) > new Date(a.date) ? r : a
+  );
 };
 
 const capitalize = (s) => {
@@ -204,9 +205,10 @@ const getAllActions = async () => {
 export default {
   statusToString,
   getStatusFromString,
-  getActionsForRole,
   getActionByID,
   getAllActions,
   getActionByIDAsync,
+  getAvailableActionsForTicket,
+  getLatestTicketStatusByDate,
   capitalize,
 };

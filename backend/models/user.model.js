@@ -20,6 +20,7 @@ const UserSchema = new Schema({
 });
 
 UserSchema.pre("save", function (next) {
+  debugger;
   if (this.isNew || this.isModified("password")) {
     const document = this;
     bcrypt.hash(this.password, saltRounds, function (err, hashedPassword) {

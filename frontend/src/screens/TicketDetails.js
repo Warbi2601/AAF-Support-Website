@@ -23,7 +23,6 @@ export default class TicketDetails extends Component {
       ticket: {},
       addMoreInfoModalOpen: false,
       addInfoComponent: null,
-      actions: [],
     };
   }
 
@@ -66,22 +65,6 @@ export default class TicketDetails extends Component {
           toast.error("Error getting ticket");
         })
     );
-  };
-
-  getPermissions = () => {
-    // trackPromise(
-    axios
-      .get(settings.apiUrl + "/rolePermissions")
-      .then((res) => {
-        this.setState({
-          actions: res.data,
-        });
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error("Error getting user permissions");
-      });
-    // );
   };
 
   updateTicket = (ticket, action, successMessage) => {
@@ -150,17 +133,34 @@ export default class TicketDetails extends Component {
   };
 
   render() {
-    let data = this.state.ticket || {};
+    let data = this.state.ticket || null;
+
+    if (
+      data && // 👈 null and undefined check
+      Object.keys(data).length === 0 &&
+      data.constructor === Object
+    )
+      return null;
     const user = this.context.user;
     const userName = user ? `${user?.firstName} ${user?.lastName}` : "";
 
-    console.dir("actions", this.state.actions);
+    const allUserActions = this.context.user.permissions.actions;
+
+    const lastStatus = utility.getLatestTicketStatusByDate(data.statusHistory);
+
+    console.log("LAST STATUS", lastStatus);
+
+    const availableActions = utility.getAvailableActionsForTicket(
+      allUserActions,
+      lastStatus
+    );
+
+    console.log("AVAILABLE ACTIONS FOR USER", availableActions);
 
     const columns = [
       {
         name: "Action",
-        selector: (row) =>
-          utility.getActionByID(this.state.actions, row.action)?.name,
+        selector: (row) => row.actionName,
         sortable: true,
       },
       {
@@ -186,7 +186,12 @@ export default class TicketDetails extends Component {
               Logged By:
               {` ${data.loggedBy?.firstName} ${data.loggedBy?.lastName} (${data.loggedBy?.email})`}
             </p>
-            <p>Logged For: {data.loggedFor?.email}</p>
+            <p>
+              Logged For:
+              {data.loggedFor
+                ? ` ${data.loggedFor.firstName} ${data.loggedFor.lastName} (${data.loggedFor.email})`
+                : " N/A"}
+            </p>
             <p>
               Date Logged:{" "}
               {moment(data.dateLogged).format(formatting.dateTimeFormat)}
@@ -194,7 +199,7 @@ export default class TicketDetails extends Component {
             <p>Department: {data.department}</p>
             <p>Assigned To: {data.assignedTo?.email}</p>
 
-            {data.moreInfo && (
+            {data.moreInfo.length > 0 && (
               <>
                 <br />
                 <h3>More Info</h3> <br />
@@ -207,8 +212,8 @@ export default class TicketDetails extends Component {
               </>
             )}
 
-            {this.state.actions &&
-              this.state.actions.map((action) => (
+            {availableActions &&
+              availableActions.map((action) => (
                 <button
                   onClick={() => {
                     let fn = this[action.fnString]; //get function from string
@@ -223,7 +228,7 @@ export default class TicketDetails extends Component {
           </div>
           <div className="col-md-6">
             <h3>Current Status</h3>
-            <p>Status: {utility.statusToString(data.status)}</p>
+            <p>Status: {lastStatus.actionName}</p>
             <br />
             <h3>Status History</h3>
             <br />
@@ -255,6 +260,5 @@ export default class TicketDetails extends Component {
 
   componentDidMount() {
     this.getTicket();
-    this.getPermissions();
   }
 }

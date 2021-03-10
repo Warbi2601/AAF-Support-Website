@@ -29,12 +29,9 @@ const ticketSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "User",
     },
-    status: {
-      type: Object,
-      required: true,
-    },
     statusHistory: {
       type: [Schema.Types.Mixed],
+      required: true,
     },
     moreInfo: {
       type: [Schema.Types.Mixed],
