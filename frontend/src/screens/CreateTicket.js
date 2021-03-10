@@ -20,12 +20,14 @@ export default class CreateTicket extends Component {
   }
 
   componentDidMount() {
-    axios.get(settings.apiUrl + "/users").then((res) => {
-      this.setState({
-        users: res.data,
-        loading: false,
+    if (!this.props.forSelf) {
+      axios.get(settings.apiUrl + "/users").then((res) => {
+        this.setState({
+          users: res.data,
+          loading: false,
+        });
       });
-    });
+    }
   }
 
   render() {

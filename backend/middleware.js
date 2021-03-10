@@ -6,7 +6,7 @@ exports.withAuth = (req, res, next) => {
   const token =
     req.body.token ||
     req.query.token ||
-    req.headers["x-access-token"] ||
+    req.headers["x-access-token"] || //used in postman
     req.cookies.token;
 
   if (!token) {
@@ -16,7 +16,7 @@ exports.withAuth = (req, res, next) => {
       if (err) {
         res.status(401).send("Unauthorized: Invalid token");
       } else {
-        // Check if token has expired
+        // Check if token is valid and set to locals if not
         res.locals.loggedInUser = await User.findById(decoded._id);
         next();
       }
@@ -24,7 +24,7 @@ exports.withAuth = (req, res, next) => {
   }
 };
 
-exports.checkRole = async (req, res, next) => {
+exports.checkRoleTicketAction = async (req, res, next) => {
   try {
     const { ticket, action } = req.body;
 
@@ -35,6 +35,7 @@ exports.checkRole = async (req, res, next) => {
       });
     }
 
+    //get action object from the ID
     let actionObj = getActionByID(action);
 
     // if the ticket action is an update then we need to check its updating the correct ticket from the ID
@@ -46,6 +47,7 @@ exports.checkRole = async (req, res, next) => {
 
     const user = res.locals.loggedInUser;
 
+    // checks to see if that user can run that action
     const canRunAction = checkTicketActionAccess(user, action);
 
     if (!canRunAction) {
@@ -57,4 +59,24 @@ exports.checkRole = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+};
+
+exports.checkRole = (roles) => {
+  return async (req, res, next) => {
+    try {
+      const user = res.locals.loggedInUser;
+
+      //check if their role matches the ones defined as having access in the roles array
+      const isValid = roles.some((x) => x === user.role);
+
+      if (!isValid) {
+        return res.status(403).json({
+          error: "You don't have the correct permission to perform this action",
+        });
+      }
+      next();
+    } catch (error) {
+      next(error);
+    }
+  };
 };

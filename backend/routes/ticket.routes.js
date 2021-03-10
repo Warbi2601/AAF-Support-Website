@@ -7,10 +7,10 @@ router.get("/", controller.getAllTickets);
 
 router.get("/:id", controller.getTicket);
 
-router.post("/", middleware.checkRole, controller.addTicket);
+router.post("/", middleware.checkRoleTicketAction, controller.addTicket);
 
-router.put("/:id", middleware.checkRole, controller.updateTicket);
+router.put("/:id", middleware.checkRoleTicketAction, controller.updateTicket);
 
-router.delete("/:id", controller.deleteTicket);
+router.delete("/:id", middleware.checkRole(["admin"]), controller.deleteTicket);
 
 module.exports = router;

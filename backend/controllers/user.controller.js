@@ -2,6 +2,16 @@ const User = require("../models/user.model");
 
 exports.getUser = (req, res) => {
   let id = req.params.id;
+
+  const user = res.locals.loggedInUser;
+
+  // make it so a client can only hit this endpoint if they are getting themseleves
+  if (user.role === "client" && id !== user._id) {
+    return res.status(403).json({
+      error: "You don't have the correct permission to perform this action",
+    });
+  }
+
   User.findOne({ _id: id }, function (err, user) {
     if (err) {
       console.error(err);

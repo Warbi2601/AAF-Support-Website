@@ -67,6 +67,13 @@ exports.getTicket = (req, res) => {
       return;
     }
 
+    if (res.locals.loggedInUser.role === "client") {
+      res.status(403).json({
+        error: "You do not have permission to view this ticket",
+      });
+      return;
+    }
+
     res.status(200).json(ticket).send();
   })
     .populate("loggedBy")
