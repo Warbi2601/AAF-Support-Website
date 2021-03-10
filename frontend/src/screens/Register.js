@@ -50,7 +50,7 @@ export default class Register extends Component {
           toast.success(res.data.success);
         })
         .catch((err) => {
-          toast.error(err.response.data);
+          toast.error(err.response.data.error);
         }),
       "register-area"
     );
