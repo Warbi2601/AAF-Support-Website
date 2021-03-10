@@ -56,15 +56,12 @@ export default class TicketDetails extends Component {
       axios
         .get(settings.apiUrl + "/tickets/" + this.props.match.params.id)
         .then((res) => {
-          debugger;
           this.setState({
             ticket: res.data,
           });
         })
         .catch((err) => {
           console.log(err);
-          debugger;
-
           toast.error(err.response.data.error);
         })
     );
@@ -186,7 +183,6 @@ export default class TicketDetails extends Component {
             <AddInformation
               action={action}
               onSubmit={(values) => {
-                debugger;
                 this.addMoreInfoSubmit(values, "Ticket Suspended");
               }}
             />

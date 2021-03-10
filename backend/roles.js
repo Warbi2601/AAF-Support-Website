@@ -31,8 +31,6 @@ exports.getActionByID = (id) => {
 // get list of actions that this role can perform from the db
 exports.checkTicketActionAccess = (user, action) => {
   try {
-    debugger;
-
     //this will get the object that represents their role including all the actions they can do
     let actions = this.getPermissionsForRole(user.role).actions;
 

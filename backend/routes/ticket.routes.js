@@ -11,6 +11,6 @@ router.post("/", middleware.checkRole, controller.addTicket);
 
 router.put("/:id", middleware.checkRole, controller.updateTicket);
 
-// router.delete("/", controller.deleteTicket);
+router.delete("/:id", controller.deleteTicket);
 
 module.exports = router;

@@ -114,8 +114,6 @@ exports.updateTicket = async (req, res) => {
       currentStatus: actionObj.currentStatus,
     });
 
-    debugger;
-
     const updatedTicket = await Ticket.findOneAndUpdate(
       { _id: ticket._id },
       ticket,
@@ -140,4 +138,19 @@ exports.updateTicket = async (req, res) => {
       error: "Something went wrong when updating the ticket",
     });
   }
+};
+
+exports.deleteTicket = (req, res) => {
+  let ticketID = req.params.id;
+  Ticket.deleteOne({ _id: ticketID }, function (err) {
+    if (err) {
+      res.status(500).json({
+        error: "Error deleting the ticket",
+      });
+    } else {
+      res.status(200).json({
+        success: "Ticket successfully deleted",
+      });
+    }
+  });
 };

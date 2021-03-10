@@ -125,22 +125,6 @@ export default class Tickets extends Component {
   }
 
   componentDidMount() {
-    // const onDelete = (itemToDelete) => {
-    //   console.log(itemToDelete._id);
-
-    //   axios
-    //     .delete(settings.apiUrl + "/animals/delete-animal/" + itemToDelete._id)
-    //     .then((res) => {
-    //       if (res.error) this.setState({ error: res.error });
-
-    //       this.setState({
-    //         tickets: this.state.tickets.filter(
-    //           (item) => item.props._id !== itemToDelete._id
-    //         ),
-    //       });
-    //     });
-    // };
-
     axios
       .get(settings.apiUrl + "/tickets")
       .then((res) => {
