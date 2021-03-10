@@ -61,6 +61,7 @@ exports.getAllActions = () => {
           name: "Open Ticket",
           availableActions: [3, 4, 14],
           type: "create",
+          currentStatus: "Open",
         },
         {
           order: 8,
@@ -68,6 +69,7 @@ exports.getAllActions = () => {
           fnString: "reopenTicket",
           availableActions: [5],
           type: "update",
+          currentStatus: "Open",
         },
         {
           order: 10,
@@ -75,6 +77,7 @@ exports.getAllActions = () => {
           fnString: "addMoreInfo",
           availableActions: [5],
           type: "update",
+          currentStatus: "Info Added?????",
         },
         {
           order: 11,
@@ -82,6 +85,7 @@ exports.getAllActions = () => {
           fnString: "closeTicket",
           availableActions: [],
           type: "update",
+          currentStatus: "Closed By User",
         },
         {
           order: 14,
@@ -89,6 +93,7 @@ exports.getAllActions = () => {
           fnString: "cancelTicketByUser",
           availableActions: [],
           type: "update",
+          currentStatus: "Cancelled By User",
         },
       ],
     },
@@ -100,6 +105,7 @@ exports.getAllActions = () => {
           name: "Open Ticket on behalf", // This is only needed on the view tickets screen
           availableActions: [3, 4, 14],
           type: "create",
+          currentStatus: "Open",
         },
         {
           order: 4,
@@ -107,6 +113,7 @@ exports.getAllActions = () => {
           fnString: "allocateToSelf",
           availableActions: [5],
           type: "update",
+          currentStatus: "Allocated To Support",
         },
         {
           order: 5,
@@ -114,6 +121,7 @@ exports.getAllActions = () => {
           fnString: "checkTicket",
           availableActions: [6, 7, 9, 13],
           type: "update",
+          currentStatus: "Checked???",
         },
         {
           order: 6,
@@ -121,6 +129,7 @@ exports.getAllActions = () => {
           fnString: "reallocateTicket",
           availableActions: [5],
           type: "update",
+          currentStatus: "Allocated To Support",
         },
         {
           order: 7,
@@ -128,6 +137,7 @@ exports.getAllActions = () => {
           fnString: "solveTicket",
           availableActions: [11, 12],
           type: "update",
+          currentStatus: "Solved",
         },
         {
           order: 9,
@@ -135,6 +145,7 @@ exports.getAllActions = () => {
           fnString: "suspendTicket",
           availableActions: [10, 14, 15],
           type: "update",
+          currentStatus: "Suspended - Awaiting Client Information",
         },
         {
           order: 13,
@@ -142,6 +153,7 @@ exports.getAllActions = () => {
           fnString: "cancelTicketBySupport",
           availableActions: [],
           type: "update",
+          currentStatus: "Cancelled By Support",
         },
         {
           order: 15,
@@ -149,6 +161,7 @@ exports.getAllActions = () => {
           fnString: "cancelAbandonedTicket",
           availableActions: [],
           type: "update",
+          currentStatus: "Abandoned Ticket Cancelled By Support",
         },
       ],
     },
@@ -161,6 +174,7 @@ exports.getAllActions = () => {
           fnString: "allocateToSupport",
           availableActions: [5],
           type: "update",
+          currentStatus: "Allocated To Support",
         },
         {
           order: 12,
@@ -168,6 +182,7 @@ exports.getAllActions = () => {
           fnString: "closeExpiredTicket",
           availableActions: [5],
           type: "update",
+          currentStatus: "Expired Ticket Closed By Admin",
         },
       ],
     },

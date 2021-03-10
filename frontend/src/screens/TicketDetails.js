@@ -56,13 +56,16 @@ export default class TicketDetails extends Component {
       axios
         .get(settings.apiUrl + "/tickets/" + this.props.match.params.id)
         .then((res) => {
+          debugger;
           this.setState({
             ticket: res.data,
           });
         })
         .catch((err) => {
           console.log(err);
-          toast.error("Error getting ticket");
+          debugger;
+
+          toast.error(err.response.data.error);
         })
     );
   };
@@ -85,6 +88,10 @@ export default class TicketDetails extends Component {
     );
   };
 
+  //#region Ticket Actions
+
+  //#region Client Actions
+
   reopenTicket = (action) => {
     //render an are you sure modal
     this.confirmPopup(
@@ -95,23 +102,24 @@ export default class TicketDetails extends Component {
   };
 
   addMoreInfo = async (action) => {
-    // render modal with just issue textarea and update that field --- make sure to pass current issue text into it
-    // if (this.state.addMoreInfoModalOpen) {
-    // } else {
     this.setState({
       addInfoComponent: (
-        <AddInformation action={action} onSubmit={this.addMoreInfoSubmit} />
+        <AddInformation
+          action={action}
+          onSubmit={(values) =>
+            this.addMoreInfoSubmit(values, "Information Added")
+          }
+        />
       ),
       addMoreInfoModalOpen: true,
     });
-    // }
   };
 
-  addMoreInfoSubmit = (values) => {
+  addMoreInfoSubmit = (values, successMsg) => {
     let ticket = Object.assign({}, this.state.ticket); // creating copy of state variable ticket
     ticket.moreInfo.push({ date: new Date(), details: values.moreInfo });
     this.hideModal();
-    this.updateTicket(ticket, values.action, "Information Added");
+    this.updateTicket(ticket, values.action, successMsg);
   };
 
   closeTicket = (action) => {
@@ -131,6 +139,109 @@ export default class TicketDetails extends Component {
       "Are you sure you want to cancel this ticket?"
     );
   };
+
+  //#endregion
+
+  //#region Support Actions
+
+  allocateToSelf = (action) => {
+    let ticket = Object.assign({}, this.state.ticket); // creating copy of state variable ticket
+    ticket.assignedTo = this.context.user._id;
+
+    this.confirmPopup(
+      () => this.updateTicket(ticket, action, "Ticket Allocated"),
+      "Allocate ticket to self",
+      "Are you sure you want to allocate this ticket to yourself?"
+    );
+  };
+
+  checkTicket = (action) => {
+    //render an are you sure modal
+    this.confirmPopup(
+      () => this.updateTicket(this.state.ticket, action, "Ticket Checked"),
+      "Check ticket",
+      "Are you sure you want to mark this ticket as checked?"
+    );
+  };
+
+  reallocateTicket = (action) => {
+    //render a modal to select the support agent to allocate to
+  };
+
+  solveTicket = (action) => {
+    //render an are you sure modal
+    this.confirmPopup(
+      () => this.updateTicket(this.state.ticket, action, "Ticket Solved"),
+      "Solve ticket",
+      "Are you sure you want to mark this ticket as solved?"
+    );
+  };
+
+  suspendTicket = (action) => {
+    //render an are you sure modal
+    this.confirmPopup(
+      () =>
+        this.setState({
+          addInfoComponent: (
+            <AddInformation
+              action={action}
+              onSubmit={(values) => {
+                debugger;
+                this.addMoreInfoSubmit(values, "Ticket Suspended");
+              }}
+            />
+          ),
+          addMoreInfoModalOpen: true,
+        }),
+      "Suspend ticket",
+      "Are you sure you want to mark this ticket as suspended? You will be required to input some information to say why it has been suspended."
+    );
+  };
+
+  cancelTicketBySupport = (action) => {
+    //render an are you sure modal
+    this.confirmPopup(
+      () => this.updateTicket(this.state.ticket, action, "Ticket Cancelled"),
+      "Cancel ticket",
+      "Are you sure you want to mark this ticket as cancelled?"
+    );
+  };
+
+  cancelAbandonedTicket = (action) => {
+    //render an are you sure modal
+    this.confirmPopup(
+      () =>
+        this.updateTicket(
+          this.state.ticket,
+          action,
+          "Abandoned Ticket Cancelled"
+        ),
+      "Cancel abandoned ticket",
+      "Are you sure you want to mark this abandoned ticket as cancelled?"
+    );
+  };
+
+  //#endregion
+
+  //#region Admin
+
+  allocateToSupport = (action) => {
+    //render same reallocate modal
+  };
+
+  closeExpiredTicket = (action) => {
+    //render an are you sure modal
+    this.confirmPopup(
+      () =>
+        this.updateTicket(this.state.ticket, action, "Expired Ticket Closed"),
+      "Close expired ticket",
+      "Are you sure you want to close this expired ticket?"
+    );
+  };
+
+  //#endregion
+
+  //#endregion
 
   render() {
     let data = this.state.ticket || null;
@@ -170,7 +281,7 @@ export default class TicketDetails extends Component {
       },
       {
         name: "User",
-        selector: (row) => row.userName,
+        selector: (row) => row.user.name,
         sortable: true,
       },
     ];
@@ -197,7 +308,7 @@ export default class TicketDetails extends Component {
               {moment(data.dateLogged).format(formatting.dateTimeFormat)}
             </p>
             <p>Department: {data.department}</p>
-            <p>Assigned To: {data.assignedTo?.email}</p>
+            <p>Allocated To: {data.assignedTo?.email}</p>
 
             {data.moreInfo.length > 0 && (
               <>
@@ -228,7 +339,7 @@ export default class TicketDetails extends Component {
           </div>
           <div className="col-md-6">
             <h3>Current Status</h3>
-            <p>Status: {lastStatus.actionName}</p>
+            <p>Status: {lastStatus.currentStatus}</p>
             <br />
             <h3>Status History</h3>
             <br />

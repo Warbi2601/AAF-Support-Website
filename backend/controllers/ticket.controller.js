@@ -8,13 +8,17 @@ exports.addTicket = (req, res) => {
   ticket.loggedBy = user._id;
 
   if (user.role === "support" && !ticket.loggedFor) {
-    res
-      .status(400)
-      .send("You need to select a user to create this ticket on behalf of");
+    res.status(400).json({
+      error: "You need to select a user to create this ticket on behalf of",
+    });
+    return;
   }
 
   if (user.role === "client" && ticket.loggedFor) {
-    res.status(400).send("You can't create a ticket on behalf of another user");
+    res.status(400).json({
+      error: "You can't create a ticket on behalf of another user",
+    });
+    return;
   }
 
   const actionObj = roles.getActionByID(action);
@@ -35,7 +39,7 @@ exports.addTicket = (req, res) => {
   newTicket.save(function (err) {
     if (err) {
       console.log(err);
-      res.status(500).send("Error logging your ticket, try again.");
+      res.status(500).json({ error: "Error logging your ticket, try again." });
     } else {
       res.status(200).json({
         success: "Ticket successfully added!",
@@ -53,9 +57,17 @@ exports.getTicket = (req, res) => {
       res.status(500).json({
         error: "Internal error please try again",
       });
-    } else {
-      res.status(200).json(ticket);
+      return;
     }
+
+    if (!ticket) {
+      res.status(404).json({
+        error: "Ticket not found",
+      });
+      return;
+    }
+
+    res.status(200).json(ticket).send();
   })
     .populate("loggedBy")
     .populate("loggedFor")
@@ -78,8 +90,8 @@ exports.getAllTickets = (req, res) => {
       res.send(data);
     })
     .catch((err) => {
-      res.status(500).send({
-        message: err.message || "An error occurred while retrieving Tickets.",
+      res.status(500).json({
+        error: err.message || "An error occurred while retrieving Tickets.",
       });
     });
 };
@@ -99,7 +111,10 @@ exports.updateTicket = async (req, res) => {
         name: `${user.firstName} ${user.lastName} (${user.email})`,
       },
       availableActions: actionObj.availableActions,
+      currentStatus: actionObj.currentStatus,
     });
+
+    debugger;
 
     const updatedTicket = await Ticket.findOneAndUpdate(
       { _id: ticket._id },
@@ -110,10 +125,12 @@ exports.updateTicket = async (req, res) => {
     );
 
     // If the function returns null then it didnt update
-    if (!updatedTicket)
+    if (!updatedTicket) {
       res.status(500).json({
         error: "Something went wrong when updating the ticket",
       });
+      return;
+    }
 
     res.status(200).json({
       success: "Ticket updated",

@@ -6,21 +6,23 @@ import "../styles/Form.scss";
 import FormField from "../components/forms/FormField";
 import FormButton from "../components/forms/FormButton";
 
-const updateInfoSchema = Yup.object().shape({
-  moreInfo: Yup.string().required().label("More Information"),
-});
-
-const initialValues = {
-  moreInfo: "",
-};
-
-export default class CreateTicket extends Component {
+export default class AddInformation extends Component {
   constructor(props) {
     super(props);
     this.state = {};
   }
 
   render() {
+    const updateInfoSchema = Yup.object().shape({
+      moreInfo: Yup.string().required().label("More Information"),
+      action: Yup.number().required(),
+    });
+
+    const initialValues = {
+      moreInfo: "",
+      action: this.props.action,
+    };
+
     return (
       <Formik
         initialValues={initialValues}
@@ -38,7 +40,12 @@ export default class CreateTicket extends Component {
                     label="More Information"
                     as="textarea"
                   />
-                  <FormField formik={formik} name="action" hidden />
+                  <FormField
+                    formik={formik}
+                    value={this.props.action}
+                    name="action"
+                    hidden
+                  />
                   <hr />
                   <FormButton title="Add More Information" formik={formik} />
                 </Form>

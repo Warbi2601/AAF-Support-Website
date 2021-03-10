@@ -23,8 +23,8 @@ exports.getAllUsers = (req, res) => {
       res.send(data);
     })
     .catch((err) => {
-      res.status(500).send({
-        message: err.message || "An error occurred while retrieving Users.",
+      res.status(500).json({
+        error: err.message || "An error occurred while retrieving Users.",
       });
     });
 };
@@ -32,13 +32,15 @@ exports.getAllUsers = (req, res) => {
 exports.deleteUser = (req, res) => {
   let userID = req.params.id;
   User.deleteOne({ _id: userID }, function (err) {
-    if (err)
+    if (err) {
       res.status(500).json({
         error: "Error deleting the user",
       });
-    res.status(200).json({
-      success: "User successfully deleted",
-    });
+    } else {
+      res.status(200).json({
+        success: "User successfully deleted",
+      });
+    }
   });
 };
 

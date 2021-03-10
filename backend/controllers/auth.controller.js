@@ -15,8 +15,13 @@ exports.register = async (req, res) => {
   user.save(async function (err) {
     if (err) {
       console.log(err);
-      if (err.errors?.email) res.status(400).send("Email already taken");
-      res.status(500).send("Error registering your account, try again.");
+      if (err.errors?.email) {
+        res.status(400).json({ error: "Email already taken." });
+      } else {
+        res
+          .status(500)
+          .json({ error: "Error registering your account, try again." });
+      }
     } else {
       // Issue token
       const payload = { email, _id: user._id };
