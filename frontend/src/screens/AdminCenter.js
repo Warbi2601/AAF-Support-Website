@@ -47,7 +47,13 @@ export default class AdminCenter extends Component {
           onClick={() => {
             this.setState({
               EditComponent: () => (
-                <EditUser user={row} hideModal={this.hideModal} />
+                <EditUser
+                  user={row}
+                  onComplete={() => {
+                    this.hideModal();
+                    this.getUsers();
+                  }}
+                />
               ),
             });
             this.showModal();
@@ -70,11 +76,23 @@ export default class AdminCenter extends Component {
         </button>
       ),
       sortable: true,
-      // cell: (row) => (
-      //   <div>{row.loggedFor?.email || <span className="error">N/A</span>}</div>
-      // ),
     },
   ];
+
+  componentDidMount() {
+    this.getUsers();
+  }
+
+  getUsers = () => {
+    axios
+      .get(settings.apiUrl + "/users")
+      .then((res) => {
+        this.setState({ users: res.data, loading: false });
+      })
+      .catch((err) => {
+        toast.error(err.response.data.error);
+      });
+  };
 
   showModal = () => {
     this.setState({ modalOpen: true });
@@ -88,7 +106,7 @@ export default class AdminCenter extends Component {
     confirmAlert({
       title: "Delete User",
       message:
-        "Are you sure you want to delete this user? All tickets related to this user will be moved to the state of cancelled.",
+        "Are you sure you want to delete this user? All tickets related to this user will be deleted.",
       buttons: [
         {
           label: "Yes",
@@ -96,7 +114,6 @@ export default class AdminCenter extends Component {
         },
         {
           label: "No",
-          // onClick: () => alert('Click No')
         },
       ],
     });
@@ -119,10 +136,6 @@ export default class AdminCenter extends Component {
     let data = this.state.users || [];
     return (
       <div>
-        {/* <button onClick={this.showModal} className="btn-default">
-          Promote User
-        </button> */}
-
         <Modal
           title="Edit User"
           BodyComponent={this.state.EditComponent}
@@ -146,16 +159,5 @@ export default class AdminCenter extends Component {
         />
       </div>
     );
-  }
-
-  componentDidMount() {
-    axios
-      .get(settings.apiUrl + "/users")
-      .then((res) => {
-        this.setState({ users: res.data, loading: false });
-      })
-      .catch((err) => {
-        toast.error(err.response.data.error);
-      });
   }
 }

@@ -67,7 +67,13 @@ exports.getTicket = (req, res) => {
       return;
     }
 
-    if (res.locals.loggedInUser.role === "client") {
+    const user = res.locals.loggedInUser;
+
+    // make sure that a user can't see a ticket that isn't their own
+    if (
+      user.role === "client" &&
+      (user._id === ticket.loggedBy._id || user._id === ticket.loggedFor._id)
+    ) {
       res.status(403).json({
         error: "You do not have permission to view this ticket",
       });

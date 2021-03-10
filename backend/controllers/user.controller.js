@@ -67,13 +67,22 @@ exports.updateUser = async (req, res) => {
           error: "Internal error please try again",
         });
       } else {
-        if (password) user.password = password;
-        if (role) user.role = role;
+        // build up the success message to be clear on what has been updated
+        let successMsg = "";
+        if (password) {
+          user.password = password;
+          successMsg = "Password updated";
+        }
+        if (role) {
+          user.role = role;
+          successMsg = "Role updated";
+        }
+        if (password && role) successMsg = "Password and role updated";
 
         user.save();
 
         res.status(200).json({
-          success: "User updated",
+          success: successMsg,
         });
       }
     });

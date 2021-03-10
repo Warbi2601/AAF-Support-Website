@@ -33,19 +33,23 @@ export default class EditUser extends Component {
   };
 
   onSubmit = async (values, { resetForm }) => {
+    //needed to not interfere with existing password if it hasn't been changed
     if (values.password === "") delete values.password;
-    if (values.password.length < 6) {
+
+    //validation
+    if (values.password && values.password.length < 6) {
       toast.error("Password needs to be minimum 6 characters");
       return;
     }
+
     trackPromise(
       axios
         .put(`${settings.apiUrl}/users/${this.props.user._id}`, values)
         .then((res) => {
           resetForm();
           toast.success(res.data.success);
-          this.props.hideModal();
-          // closeModal
+          //refresh users and close modal
+          this.props.onComplete();
         })
         .catch((err) => {
           toast.error(err.response.data.error);

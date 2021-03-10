@@ -11,7 +11,6 @@ import "react-toastify/dist/ReactToastify.css";
 import "react-confirm-alert/src/react-confirm-alert.css";
 
 import "./App.css";
-import "./styles/site.scss";
 import Home from "./components/Home";
 // import Secret from "./components/Secret";
 import WithAuth from "./components/filters/WithAuth";
@@ -30,6 +29,8 @@ import Logout from "./screens/Logout";
 import CheckAuth from "./screens/CheckAuth";
 import LoadingIndicator from "./components/Loader/LoadingIndicator";
 import AdminCenter from "./screens/AdminCenter";
+import Navigation from "./components/Navigation";
+import "./styles/site.scss";
 
 function App() {
   // axios.defaults.headers.common["x-access-token"] = "HELLO";
@@ -95,77 +96,10 @@ function App() {
       <Router>
         <div className="App">
           <header className="App-header">
-            <Navbar bg="dark" variant="dark">
-              <Container>
-                <Nav className="justify-content-end">
-                  <Nav>
-                    <Link to={"/home"} className="nav-link">
-                      Home
-                    </Link>
-                  </Nav>
-                  {/* <Nav>
-                    <Link to={"/secret"} className="nav-link">
-                      Secret
-                    </Link>
-                  </Nav> */}
-
-                  {!user && (
-                    <Nav>
-                      <Link to={"/login"} className="nav-link">
-                        Login
-                      </Link>
-                    </Nav>
-                  )}
-                  {!user && (
-                    <Nav>
-                      <Link to={"/register"} className="nav-link">
-                        Register
-                      </Link>
-                    </Nav>
-                  )}
-                  {user && (
-                    <Nav>
-                      <Link to={"/logout"} className="nav-link">
-                        Logout
-                      </Link>
-                    </Nav>
-                  )}
-                  {/* <Nav>
-                    <Link to={"/create-ticket"} className="nav-link">
-                      Create Ticket
-                    </Link>
-                  </Nav> */}
-
-                  <Nav>
-                    <Link to={"/tickets"} className="nav-link">
-                      Tickets
-                    </Link>
-                  </Nav>
-
-                  {!user ||
-                    (user.role === "admin" && (
-                      <Nav>
-                        <Link to={"/admin-center"} className="nav-link">
-                          Admin Center
-                        </Link>
-                      </Nav>
-                    ))}
-
-                  <Nav>
-                    <Link to={"/chatLobby"} className="nav-link">
-                      Chat Lobby
-                    </Link>
-                  </Nav>
-                </Nav>
-              </Container>
-            </Navbar>
-            {/* @todo Remove this debugger */}
-            <p style={{ fontSize: "10px", margin: 0 }}>
-              {user && `Logged in as ${user?.role}`}
-            </p>
+            <Navigation />
           </header>
 
-          <Container>
+          <Container className="body-container">
             <Row>
               <Col md={12}>
                 <div className="wrapper">
