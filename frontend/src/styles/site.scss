@@ -4,6 +4,8 @@ $base-bgcolor: #213159;
 $base-color: #e7e7e7;
 $base-btn-color: #f04b4c;
 
+$color-off-white: #f5f5f5;
+
 $base-font-weight: 300;
 $base-font-size: 1rem;
 $base-line-height: 1.5;
@@ -58,7 +60,7 @@ body,
       width: 0%;
       content: ".";
       color: transparent;
-      background: #aaa;
+      background: $color-off-white;
       height: 1px;
     }
 
@@ -67,13 +69,8 @@ body,
     }
 
     a {
-      display: block;
-      padding: 5px;
-      text-decoration: none;
       color: #aaa;
-      // font-weight: 800;
-      // text-transform: uppercase;
-      margin: 0 10px;
+      margin: 0 15px;
     }
     a,
     a:after,
@@ -81,12 +78,17 @@ body,
       transition: all 0.5s;
     }
     a:hover {
-      color: "#555";
+      color: $color-off-white;
+    }
+
+    a.active {
+      color: $color-off-white;
+    }
+
+    a.active::after {
+      width: 100%;
     }
   }
-  // nav .navbar-nav {
-  //   display: inline-block;
-  // }
 }
 
 input:focus,

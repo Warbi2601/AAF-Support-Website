@@ -10,7 +10,7 @@ router.post("/login", controller.login);
 
 router.get("/checkToken", withAuth, controller.checkToken);
 
-router.get("/logout", function (req, res) {
+router.get("/logout", (req, res) => {
   res.clearCookie("token").redirect("/");
 });
 

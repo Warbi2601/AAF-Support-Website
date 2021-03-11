@@ -151,11 +151,7 @@ export default class AdminCenter extends Component {
           title="Users"
           columns={this.columns}
           data={data}
-          loading={this.state.loading}
-          //   onRowClicked={(item) => {
-          //     this.props.history.push("/ticket-details/" + item._id);
-          //     console.log(item);
-          //   }}
+          progressPending={this.state.loading}
         />
       </div>
     );

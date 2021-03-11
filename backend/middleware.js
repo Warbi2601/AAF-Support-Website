@@ -30,7 +30,7 @@ exports.checkRoleTicketAction = async (req, res, next) => {
 
     // request validation to ensure its a clean request
     if (!action) {
-      res.status(500).json({
+      return res.status(500).json({
         error: "No ticket action defined",
       });
     }
@@ -40,7 +40,7 @@ exports.checkRoleTicketAction = async (req, res, next) => {
 
     // if the ticket action is an update then we need to check its updating the correct ticket from the ID
     if (actionObj.type === "update" && ticket._id !== req.params.id) {
-      res.status(500).json({
+      return res.status(500).json({
         error: "The ticket doesn't match the ticket you're trying to update",
       });
     }

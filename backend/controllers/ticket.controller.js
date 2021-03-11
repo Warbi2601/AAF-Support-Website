@@ -54,17 +54,15 @@ exports.getTicket = (req, res) => {
   Ticket.findOne({ _id: id }, function (err, ticket) {
     if (err) {
       console.error(err);
-      res.status(500).json({
+      return res.status(500).json({
         error: "Internal error please try again",
       });
-      return;
     }
 
     if (!ticket) {
-      res.status(404).json({
+      return res.status(404).json({
         error: "Ticket not found",
       });
-      return;
     }
 
     const user = res.locals.loggedInUser;
@@ -74,13 +72,12 @@ exports.getTicket = (req, res) => {
       user.role === "client" &&
       (user._id === ticket.loggedBy._id || user._id === ticket.loggedFor._id)
     ) {
-      res.status(403).json({
+      return res.status(403).json({
         error: "You do not have permission to view this ticket",
       });
-      return;
     }
 
-    res.status(200).json(ticket).send();
+    res.status(200).json(ticket);
   })
     .populate("loggedBy")
     .populate("loggedFor")

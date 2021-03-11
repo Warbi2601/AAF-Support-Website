@@ -3,6 +3,7 @@ import { Navbar, Nav, Container } from "react-bootstrap";
 import { UserContext } from "../context/UserContext";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import websiteLogo from "../images/logo.png";
+import NavLink from "./navigation/NavLink";
 
 const Navigation = () => {
   const { user } = useContext(UserContext);
@@ -19,16 +20,16 @@ const Navigation = () => {
           <Navbar.Collapse id="responsive-navbar-nav">
             {/* <Nav> */}
             <Nav className="mr-auto main-nav">
-              <Nav.Link as={Link} to={"/home"}>
+              <Nav.Link as={NavLink} to={"/home"}>
                 Home
               </Nav.Link>
 
               {user && (
                 <>
-                  <Nav.Link as={Link} to={"/tickets"}>
+                  <Nav.Link as={NavLink} to={"/tickets"}>
                     Tickets
                   </Nav.Link>
-                  <Nav.Link as={Link} to={"/chatLobby"}>
+                  <Nav.Link as={NavLink} to={"/chatLobby"}>
                     Chat Lobby
                   </Nav.Link>
                 </>
@@ -36,7 +37,7 @@ const Navigation = () => {
 
               {!user ||
                 (user.role === "admin" && (
-                  <Nav.Link as={Link} to={"/admin-center"}>
+                  <Nav.Link as={NavLink} to={"/admin-center"}>
                     Admin Center
                   </Nav.Link>
                 ))}
@@ -73,8 +74,9 @@ const Navigation = () => {
           fontSize: "10px",
           margin: 0,
           position: "absolute",
-          top: 100,
-          left: 0,
+          top: 30,
+          left: 15,
+          zIndex: 9999,
         }}
       >
         {user && `Logged in as ${user?.role}`}

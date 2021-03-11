@@ -11,6 +11,7 @@ import "react-toastify/dist/ReactToastify.css";
 import "react-confirm-alert/src/react-confirm-alert.css";
 
 import "./App.css";
+import "./styles/site.scss";
 import Home from "./components/Home";
 // import Secret from "./components/Secret";
 import WithAuth from "./components/filters/WithAuth";
@@ -30,7 +31,6 @@ import CheckAuth from "./screens/CheckAuth";
 import LoadingIndicator from "./components/Loader/LoadingIndicator";
 import AdminCenter from "./screens/AdminCenter";
 import Navigation from "./components/Navigation";
-import "./styles/site.scss";
 
 function App() {
   // axios.defaults.headers.common["x-access-token"] = "HELLO";

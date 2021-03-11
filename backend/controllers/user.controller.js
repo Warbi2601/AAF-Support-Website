@@ -5,7 +5,7 @@ exports.getUser = (req, res) => {
 
   const user = res.locals.loggedInUser;
 
-  // make it so a client can only hit this endpoint if they are getting themseleves
+  // make it so a client can only hit this endpoint if they are getting info about themseleves
   if (user.role === "client" && id !== user._id) {
     return res.status(403).json({
       error: "You don't have the correct permission to perform this action",

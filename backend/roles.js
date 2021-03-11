@@ -75,7 +75,7 @@ exports.getAllActions = () => {
           fnString: "addMoreInfo",
           availableActions: [5],
           type: "update",
-          currentStatus: "Info Added?????",
+          currentStatus: "Information Added - Awaiting Support Response",
         },
         {
           order: 11,
@@ -119,7 +119,7 @@ exports.getAllActions = () => {
           fnString: "checkTicket",
           availableActions: [6, 7, 9, 13],
           type: "update",
-          currentStatus: "Checked???",
+          currentStatus: "Checked By Support",
         },
         {
           order: 6,

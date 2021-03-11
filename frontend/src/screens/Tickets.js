@@ -9,6 +9,7 @@ import Modal from "../components/Modal";
 import CreateTicket from "./CreateTicket";
 import formatting from "../utility/formatting";
 import { UserContext } from "../context/UserContext";
+import TicketSearch from "../components/TicketSearch";
 
 const columns = [
   {
@@ -61,6 +62,7 @@ export default class Tickets extends Component {
     super(props);
     this.state = {
       tickets: [],
+      masterTickets: [],
       loading: true,
       modalOpen: false,
     };
@@ -74,6 +76,39 @@ export default class Tickets extends Component {
     this.setState({ modalOpen: false });
   };
 
+  searchTickets = async (values) => {
+    let entries = Object.entries(values);
+    entries = entries.filter((entry) => entry[1]); // remove anything from the object to compare if its null
+    let allPropsEmpty = true;
+
+    // loop through the properties in the search and the ticket and make sure all properties match the search criteria
+    const search = this.state.masterTickets.filter((ticket) =>
+      entries.every((entry) => {
+        const key = entry[0];
+        let value = entry[1];
+        let ticketValue = ticket[key];
+        if (typeof ticketValue === "object" && ticketValue !== null) {
+          //if its an object (in the case of user) then lets get its ID to compare
+          ticketValue = ticketValue._id;
+        }
+
+        allPropsEmpty = false; // we know there is some value at this point
+        if (key === "issue" || key === "department")
+          return ticketValue.includes(value);
+        return value === ticketValue;
+      })
+    );
+
+    this.setState({
+      tickets: allPropsEmpty ? this.state.masterTickets : search, // if all the props were empty then reset the search back to all tickets
+    });
+  };
+
+  resetSearch = (resetForm) => {
+    resetForm();
+    this.setState({ tickets: this.state.masterTickets });
+  };
+
   render() {
     if (!this.context.user) return null;
     let data = this.state.tickets || [];
@@ -83,6 +118,11 @@ export default class Tickets extends Component {
       : "Create Ticket For User";
     return (
       <div>
+        <TicketSearch
+          onSubmit={this.searchTickets}
+          onReset={this.resetSearch}
+        />
+
         <button onClick={this.showModal} className="btn-default">
           {createTicketActionName}
         </button>
@@ -115,6 +155,7 @@ export default class Tickets extends Component {
           title="Tickets"
           columns={columns}
           data={data}
+          progressPending={this.state.loading}
           onRowClicked={(item) => {
             this.props.history.push("/ticket-details/" + item._id);
             console.log(item);
@@ -128,7 +169,11 @@ export default class Tickets extends Component {
     axios
       .get(settings.apiUrl + "/tickets")
       .then((res) => {
-        this.setState({ tickets: res.data, loading: false });
+        this.setState({
+          masterTickets: res.data,
+          tickets: res.data,
+          loading: false,
+        });
       })
       .catch((err) => {
         toast.error(err.response.data.error);

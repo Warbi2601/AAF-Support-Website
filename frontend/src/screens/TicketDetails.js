@@ -21,6 +21,7 @@ export default class TicketDetails extends Component {
     super(props);
     this.state = {
       ticket: {},
+      loading: true,
       addMoreInfoModalOpen: false,
       addInfoComponent: null,
     };
@@ -52,15 +53,20 @@ export default class TicketDetails extends Component {
   };
 
   getTicket = () => {
+    if (this.state.loading === false) this.setState({ loading: true });
     trackPromise(
       axios
         .get(settings.apiUrl + "/tickets/" + this.props.match.params.id)
         .then((res) => {
           this.setState({
             ticket: res.data,
+            loading: false,
           });
         })
         .catch((err) => {
+          this.setState({
+            loading: false,
+          });
           console.log(err);
           toast.error(err.response.data.error);
         })
@@ -346,10 +352,7 @@ export default class TicketDetails extends Component {
               columns={columns}
               data={data.statusHistory || []}
               key={"order"}
-              // onRowClicked={(item) => {
-              //   this.props.history.push("/ticket-details/" + item._id);
-              //   console.log(item);
-              // }}
+              progressPending={this.state.loading}
             />
           </div>
         </div>
