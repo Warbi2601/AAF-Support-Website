@@ -30,6 +30,31 @@ export default class CreateTicket extends Component {
     }
   }
 
+  onSubmit = async (values, { resetForm }) => {
+    trackPromise(
+      axios
+        .post(settings.apiUrl + "/tickets", {
+          ticket: values,
+          action: actionID,
+        })
+        .then((res) => {
+          resetForm();
+          toast.success(res.data.success);
+          if (!this.props.history) {
+            console.warn(
+              "Warning: There is no browser history to redirect to the new ticket"
+            );
+            return;
+          }
+          this.props.history.push("/ticket-details/" + res.data.ticketID);
+        })
+        .catch((err) => {
+          toast.error(err.response.data.error);
+        }),
+      "create-ticket-area"
+    );
+  };
+
   render() {
     const forSelf = this.props.forSelf;
     const actionID = forSelf ? 1 : 2; // If its the user logging it themseleves its 1, if its on behalf of a user its 2
@@ -42,35 +67,17 @@ export default class CreateTicket extends Component {
       department: Yup.string().required().label("Department"),
     });
 
-    const initialValues = {
+    let initialValues = {
       issue: "",
-      loggedFor: "",
       department: "",
     };
+    if (!forSelf) initialValues.loggedFor = ""; // so it doesnt go through with the client submit
 
     return (
       <Formik
         initialValues={initialValues}
         validationSchema={createTicketSchema}
-        onSubmit={async (values, { resetForm }) => {
-          if (values.loggedFor === "") delete values.loggedFor;
-          trackPromise(
-            axios
-              .post(settings.apiUrl + "/tickets", {
-                ticket: values,
-                action: actionID,
-              })
-              .then((res) => {
-                resetForm();
-                toast.success(res.data.success);
-                this.props.history.push("/ticket-details/" + res.data.ticketID);
-              })
-              .catch((err) => {
-                toast.error(err.response.data.error);
-              }),
-            "create-ticket-area"
-          );
-        }}
+        onSubmit={!this.props.onSubmit ? this.onSubmit : this.props.onSubmit}
       >
         {(formik) => {
           const { errors, touched, isValid, dirty, isSubmitting } = formik;
@@ -103,7 +110,11 @@ export default class CreateTicket extends Component {
                       <option value="">Select a user</option>
                       {this.state.users.map((user) =>
                         user.role === "client" ? (
-                          <option key={user._id} value={user._id}>
+                          <option
+                            data-testid="loggedForOption"
+                            key={user._id}
+                            value={user._id}
+                          >
                             {user.email}
                           </option>
                         ) : null

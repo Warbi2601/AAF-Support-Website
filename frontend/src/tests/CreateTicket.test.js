@@ -9,6 +9,7 @@ import {
   act,
 } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
+import userEvent from "@testing-library/user-event";
 
 import CreateTicket from "../screens/CreateTicket";
 
@@ -22,14 +23,14 @@ const mockUsers = [
   },
   {
     _id: "603b91c038b9227544eb867d",
-    role: "support",
+    role: "client",
     email: "b@b.com",
     firstName: "Jay",
     lastName: "Thomas",
   },
   {
     _id: "603b91c038b9267954eb837q",
-    role: "admin",
+    role: "client",
     email: "c@c.com",
     firstName: "John",
     lastName: "Davies",
@@ -37,6 +38,17 @@ const mockUsers = [
 ];
 
 describe("Create Ticket Component", () => {
+  //promise stuff needed for handling state updates
+  let promise = Promise.resolve();
+  let handleSubmit = jest.fn(() => promise);
+
+  let issueGood = "Broken Laptop";
+  let departmentGood = "IT";
+  let loggedForGood = "603b91c038b9227544eb867d";
+  let issueBad = "";
+  let departmentBad = "";
+  let loggedForBad = "";
+
   const server = setupServer(
     rest.get("/api/users", (req, res, ctx) => {
       return res(ctx.json(mockUsers));
@@ -47,143 +59,99 @@ describe("Create Ticket Component", () => {
   afterEach(async () => {
     server.resetHandlers();
     await act(() => promise);
+    promise = Promise.resolve();
+    handleSubmit = jest.fn(() => promise);
   });
   afterAll(() => server.close());
 
-  //promise stuff needed for handling state updates
-  let promise = Promise.resolve();
-  let handleSubmit = jest.fn(() => promise);
-
-  //   afterEach(async () => {
-  //      // needed for handling state updates
-  //   });
-
-  //   it("Render Form for client", async () => {
-  //     render(<CreateTicket forSelf={false} />);
-
-  //     expect(
-  //       screen.getByLabelText("Logged on behalf of")
-  //     ).not.toBeInTheDocument();
-  //  expect(screen.getByRole("button")).toHaveAttribute("disabled");
-
-  //   });
-
-  it("loads and displays greeting", async () => {
+  it("Render Form for support", async () => {
     render(<CreateTicket forSelf={false} />);
 
-    // fireEvent.click(screen.getByText("Load Greeting"));
-
-    await waitFor(() => screen.getByLabelText("Logged on behalf of"));
+    await waitFor(() => screen.getByTestId("loggedFor")); // wait until the http request has finished
 
     expect(screen.getByTestId("loggedFor")).toBeInTheDocument();
-    // expect(screen.getByRole("button")).toHaveAttribute("disabled");
+    //check that all the options are only users that have client as their role
+    expect(screen.getByRole("button")).toHaveAttribute("disabled"); //should be disabled on first render
   });
 
-  //   it("Submitting the Add Information Form with correct data", async () => {
-  //     render(<AddInformation onSubmit={handleSubmit} action={action} />);
+  it("Render Form for client", async () => {
+    render(<CreateTicket forSelf={true} />);
+    expect(screen.queryByTestId("loggedFor")).toBeNull(); // the client should never be shown this field
+    expect(screen.getByRole("button")).toHaveAttribute("disabled"); //should be disabled on first render
+  });
 
-  //     moreInfo = "Adding some more info to the ticket"; // add the correct data
+  it("Submit form as client - good data", async () => {
+    render(<CreateTicket onSubmit={handleSubmit} forSelf={true} />);
 
-  //     //type some information into the more details field and submit
-  //     userEvent.type(screen.getByLabelText(/More Information/i), moreInfo);
-  //     userEvent.click(screen.getByRole("button", { type: /submit/i }));
+    //type some information into the more details field and submit
+    userEvent.type(screen.getByLabelText(/Issue/i), issueGood);
+    userEvent.type(screen.getByLabelText(/Department/i), departmentGood);
+    userEvent.click(screen.getByRole("button", { type: /submit/i }));
 
-  //     await waitFor(() =>
-  //       expect(handleSubmit).toHaveBeenCalledWith(
-  //         {
-  //           moreInfo: moreInfo,
-  //           action: action,
-  //         },
-  //         expect.anything()
-  //       )
-  //     );
+    await waitFor(() =>
+      expect(handleSubmit).toHaveBeenCalledWith(
+        {
+          issue: issueGood,
+          department: departmentGood,
+        },
+        expect.anything()
+      )
+    );
+  });
 
-  //     await act(() => promise);
-  //   });
-});
+  it("Submit form as client - bad data", async () => {
+    render(<CreateTicket onSubmit={handleSubmit} forSelf={true} />);
 
-// // __tests__/fetch.test.js
-// import React from "react";
-// import { rest } from "msw";
-// import { setupServer } from "msw/node";
-// import { render, fireEvent, waitFor, screen } from "@testing-library/react";
-// import "@testing-library/jest-dom/extend-expect";
-// import TestComp from "../components/TestComp";
-// import WithAuth from "../components/filters/WithAuth";
-// import Tickets from "../screens/Tickets";
-// import UserContext from "../context/UserContext";
+    //type some information into the more details field and submit
+    userEvent.type(screen.getByLabelText(/Issue/i), issueBad);
+    userEvent.type(screen.getByLabelText(/Department/i), departmentBad);
+    userEvent.click(screen.getByRole("button", { type: /submit/i }));
 
-// const server = setupServer(
-//   rest.get("/greeting", (req, res, ctx) => {
-//     return res(ctx.json({ greeting: "hello there" }));
-//   })
-// );
+    expect(handleSubmit).not.toHaveBeenCalled();
+  });
 
-// beforeAll(() => server.listen());
-// afterEach(() => server.resetHandlers());
-// afterAll(() => server.close());
+  it("Submit form as support - good data", async () => {
+    render(<CreateTicket onSubmit={handleSubmit} forSelf={false} />);
 
-// test("loads and displays greeting", async () => {
-//   render(<TestComp url="/greeting" />);
+    await waitFor(
+      () =>
+        screen.getByTestId("loggedFor") &&
+        screen.getAllByTestId("loggedForOption")
+    ); // wait until the http request has finished
 
-//   fireEvent.click(screen.getByText("Load Greeting"));
+    //type some information into the more details field and submit
+    userEvent.type(screen.getByLabelText(/Issue/i), issueGood);
+    userEvent.type(screen.getByLabelText(/Department/i), departmentGood);
 
-//   await waitFor(() => screen.getByRole("heading"));
+    //select a loggedFor here and assert that the correct one is selected
+    fireEvent.change(screen.getByLabelText("Logged on behalf of"), {
+      target: { value: loggedForGood },
+    });
+    let options = screen.getAllByTestId("loggedForOption");
+    expect(options[0].selected).toBeFalsy();
+    expect(options[1].selected).toBeTruthy();
+    expect(options[2].selected).toBeFalsy();
+    userEvent.click(screen.getByRole("button", { type: /submit/i }));
 
-//   expect(screen.getByRole("heading")).toHaveTextContent("hello there");
-//   expect(screen.getByRole("button")).toHaveAttribute("disabled");
-// });
+    await waitFor(() =>
+      expect(handleSubmit).toHaveBeenCalledWith(
+        {
+          issue: issueGood,
+          department: departmentGood,
+          loggedFor: loggedForGood,
+        },
+        expect.anything()
+      )
+    );
+  });
 
-// /**
-//  * A custom render to setup providers. Extends regular
-//  * render options with `providerProps` to allow injecting
-//  * different scenarios to test with.
-//  *
-//  * @see https://testing-library.com/docs/react-testing-library/setup#custom-render
-//  */
-// const customRender = (ui, { providerProps, ...renderOptions }) => {
-//   return render(
-//     <UserContext.Provider {...providerProps}>{ui}</UserContext.Provider>,
-//     renderOptions
-//   );
-// };
+  it("Submit form as support - bad data", async () => {
+    render(<CreateTicket onSubmit={handleSubmit} forSelf={false} />);
 
-// let mockUser = {
-//   _id: "603b91c038b9281384eb871f",
-//   role: "client",
-//   email: "a@a.com",
-//   firstName: "Josh",
-//   lastName: "Warburton",
-// };
+    //type some information into the more details field and submit
+    userEvent.type(screen.getByLabelText(/Issue/i), issueBad);
+    userEvent.type(screen.getByLabelText(/Department/i), departmentBad);
+    userEvent.click(screen.getByRole("button", { type: /submit/i }));
 
-// test("loads and displays statuses", async () => {
-//   customRender(<WithAuth ComponentToProtect={Tickets} role={"admin"} />, {
-//     mockUser,
-//   });
-
-//   // expect(screen.getBy);
-
-//   // fireEvent.click(screen.getByText("Load Greeting"));
-
-//   // await waitFor(() => screen.getByRole("heading"));
-
-//   // expect(screen.getByRole("heading")).toHaveTextContent("hello there");
-//   // expect(screen.getByRole("button")).toHaveAttribute("disabled");
-// });
-
-// test("handles server error", async () => {
-//   server.use(
-//     rest.get("/greeting", (req, res, ctx) => {
-//       return res(ctx.status(500));
-//     })
-//   );
-
-//   render(<TestComp url="/greeting" />);
-
-//   fireEvent.click(screen.getByText("Load Greeting"));
-
-//   await waitFor(() => screen.getByRole("alert"));
-
-//   expect(screen.getByRole("alert")).toHaveTextContent("Oops, failed to fetch!");
-//   expect(screen.getByRole("button")).not.toHaveAttribute("disabled");
-// });
+    expect(handleSubmit).not.toHaveBeenCalled();
+  });
