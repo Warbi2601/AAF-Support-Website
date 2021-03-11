@@ -4,7 +4,7 @@ import settings from "../../settings/settings";
 import { UserContext } from "../../context/UserContext";
 import axios from "axios";
 
-export default function withAuth(ComponentToProtect, role) {
+export default function WithAuth(ComponentToProtect, role) {
   return class extends Component {
     static contextType = UserContext;
 

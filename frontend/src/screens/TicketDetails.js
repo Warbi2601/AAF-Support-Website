@@ -56,7 +56,7 @@ export default class TicketDetails extends Component {
     if (this.state.loading === false) this.setState({ loading: true });
     trackPromise(
       axios
-        .get(settings.apiUrl + "/tickets/" + this.props.match.params.id)
+        .get(settings.apiUrl + "/tickets/" + this.props.match.params.id || 0)
         .then((res) => {
           this.setState({
             ticket: res.data,
@@ -248,12 +248,18 @@ export default class TicketDetails extends Component {
   render() {
     let data = this.state.ticket || null;
 
-    if (
-      data && // 👈 null and undefined check
+    const emptyTicketObj =
+      data && // null and undefined check
       Object.keys(data).length === 0 &&
-      data.constructor === Object
-    )
-      return null;
+      data.constructor === Object;
+
+    if (emptyTicketObj && !this.state.loading)
+      return !this.state.loading ? (
+        <div>
+          <h1>Ticket Could Not Be Found</h1>
+        </div>
+      ) : null;
+
     const user = this.context.user;
     const userName = user ? `${user?.firstName} ${user?.lastName}` : "";
 

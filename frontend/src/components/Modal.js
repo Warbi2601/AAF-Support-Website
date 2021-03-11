@@ -24,7 +24,9 @@ function Modal({
         <BootstrapModal.Title>{title}</BootstrapModal.Title>
       </BootstrapModal.Header>
       <BootstrapModal.Body>
-        <BodyComponent />
+        {BodyComponent && <BodyComponent />}
+
+        <div data-testid="modal"></div>
         {/* <p>Bod</p> */}
       </BootstrapModal.Body>
       {/* <BootstrapModal.Footer>

@@ -48,7 +48,7 @@ export default class CreateTicket extends Component {
       department: "",
     };
 
-    return !this.state.loading ? (
+    return (
       <Formik
         initialValues={initialValues}
         validationSchema={createTicketSchema}
@@ -92,17 +92,20 @@ export default class CreateTicket extends Component {
                   />
 
                   {/* Only show "client"s here as they should be the only ones eligible to have tickets created for them */}
-                  {!forSelf && (
+                  {!forSelf && !this.state.loading && (
                     <FormField
                       formik={formik}
                       name="loggedFor"
                       label="Logged on behalf of"
                       as="select"
+                      data-testid="loggedFor"
                     >
                       <option value="">Select a user</option>
                       {this.state.users.map((user) =>
                         user.role === "client" ? (
-                          <option value={user._id}>{user.email}</option>
+                          <option key={user._id} value={user._id}>
+                            {user.email}
+                          </option>
                         ) : null
                       )}
                     </FormField>
@@ -116,8 +119,6 @@ export default class CreateTicket extends Component {
           );
         }}
       </Formik>
-    ) : (
-      <div>Loading...</div>
     );
   }
 }
