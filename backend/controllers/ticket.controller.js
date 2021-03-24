@@ -109,7 +109,6 @@ exports.getAllTickets = (req, res) => {
 
 exports.updateTicket = async (req, res) => {
   try {
-    debugger;
     const { ticket, action } = req.body;
     const actionObj = roles.getActionByID(action);
     const user = res.locals.loggedInUser;

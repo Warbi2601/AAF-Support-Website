@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import CachedIcon from "@material-ui/icons/Cached";
@@ -9,6 +9,7 @@ import FormButton from "../components/forms/FormButton";
 import settings from "../settings/settings";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { UserContext } from "../context/UserContext";
 
 const initialValues = {
   issue: "",
@@ -28,6 +29,7 @@ const searchTicketsSchema = Yup.object().shape({
 
 function TicketSearch({ onSubmit, onReset }) {
   const [users, setUsers] = useState([]);
+  const { user } = useContext(UserContext);
 
   const getUsers = () => {
     axios
@@ -41,7 +43,7 @@ function TicketSearch({ onSubmit, onReset }) {
   };
 
   useEffect(() => {
-    getUsers();
+    if (user && user.role !== "client") getUsers();
   }, []);
 
   return (
@@ -57,7 +59,7 @@ function TicketSearch({ onSubmit, onReset }) {
             <div className="form-container">
               <Form>
                 <div className="row">
-                  <div className="col-md-4">
+                  <div className="col-md-6">
                     <FormField
                       formik={formik}
                       name="issue"
@@ -65,64 +67,67 @@ function TicketSearch({ onSubmit, onReset }) {
                       as="textarea"
                     />
                   </div>
-                  <div className="col-md-4">
+                  <div className="col-md-6">
                     <FormField
                       formik={formik}
                       name="department"
                       label="Department"
                     />
                   </div>
-                  <div className="col-md-4">
-                    {/* Only show "client"s here as they should be the only ones eligible to have tickets created for them */}
-                    <FormField
-                      formik={formik}
-                      name="loggedFor"
-                      label="Logged on behalf of"
-                      as="select"
-                    >
-                      <option value="">Select a user</option>
-                      {users.map((user) =>
-                        user.role === "client" ? (
-                          <option value={user._id}>{user.email}</option>
-                        ) : null
-                      )}
-                    </FormField>
-                  </div>
                 </div>
 
-                <div className="row">
-                  <div className="col-md-4">
-                    <FormField
-                      formik={formik}
-                      name="loggedBy"
-                      label="Logged By"
-                      as="select"
-                    >
-                      <option value="">Select a user</option>
-                      {users.map((user) =>
-                        user.role !== "admin" ? (
-                          <option value={user._id}>{user.email}</option>
-                        ) : null
-                      )}
-                    </FormField>
+                {/* only show these options if the user is not a client */}
+                {user.role !== "client" && (
+                  <div className="row">
+                    <div className="col-md-4">
+                      {/* Only show "client"s here as they should be the only ones eligible to have tickets created for them */}
+                      <FormField
+                        formik={formik}
+                        name="loggedFor"
+                        label="Logged For"
+                        as="select"
+                      >
+                        <option value="">Select a user</option>
+                        {users.map((user) =>
+                          user.role === "client" ? (
+                            <option value={user._id}>{user.email}</option>
+                          ) : null
+                        )}
+                      </FormField>
+                    </div>
+                    <div className="col-md-4">
+                      <FormField
+                        formik={formik}
+                        name="loggedBy"
+                        label="Logged By"
+                        as="select"
+                      >
+                        <option value="">Select a user</option>
+                        {users.map((user) =>
+                          user.role !== "admin" ? (
+                            <option value={user._id}>{user.email}</option>
+                          ) : null
+                        )}
+                      </FormField>
+                    </div>
+                    <div className="col-md-4">
+                      <FormField
+                        formik={formik}
+                        name="assignedTo"
+                        label="Allocated To"
+                        as="select"
+                      >
+                        <option value="">Select a user</option>
+                        {users.map((user) =>
+                          user.role === "support" ? (
+                            <option value={user._id}>{user.email}</option>
+                          ) : null
+                        )}
+                      </FormField>
+                    </div>
+                    <div className="col-md-4"></div>
                   </div>
-                  <div className="col-md-4">
-                    <FormField
-                      formik={formik}
-                      name="assignedTo"
-                      label="Allocated To"
-                      as="select"
-                    >
-                      <option value="">Select a user</option>
-                      {users.map((user) =>
-                        user.role === "support" ? (
-                          <option value={user._id}>{user.email}</option>
-                        ) : null
-                      )}
-                    </FormField>
-                  </div>
-                  <div className="col-md-4"></div>
-                </div>
+                )}
 
                 {/* <hr /> */}
 

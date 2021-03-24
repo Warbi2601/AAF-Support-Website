@@ -42,6 +42,7 @@ const ChatHistory = ({ chatHistory }) => {
         onRowClicked={(item) => {
           showChat(item);
         }}
+        theme="default"
       />
 
       <Messages messages={messages} />

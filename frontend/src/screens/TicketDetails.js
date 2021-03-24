@@ -96,6 +96,30 @@ export default class TicketDetails extends Component {
     );
   };
 
+  deleteTicket = () => {
+    //render an are you sure modal
+    this.confirmPopup(
+      this.deleteTicketConfirm,
+      "Delete ticket",
+      "Are you sure you want to delete this ticket?"
+    );
+  };
+
+  deleteTicketConfirm = () => {
+    trackPromise(
+      axios
+        .delete(settings.apiUrl + "/tickets/" + this.props.match.params.id || 0)
+        .then((res) => {
+          this.props.history.push("/tickets");
+          toast.success("Ticket Deleted");
+        })
+        .catch((err) => {
+          console.log(err);
+          toast.error(err.response.data.error);
+        })
+    );
+  };
+
   updateTicket = (ticket, action, successMessage) => {
     trackPromise(
       axios
@@ -304,7 +328,6 @@ export default class TicketDetails extends Component {
   };
 
   allocateToSupportSubmit = (values, successMsg) => {
-    debugger;
     let ticket = Object.assign({}, this.state.ticket); // creating mutable copy of state variable ticket
 
     //set
@@ -378,6 +401,104 @@ export default class TicketDetails extends Component {
       <div className="col-md-12">
         <div className="row">
           <div className="col-md-6" style={{ textAlign: "left" }}>
+            <h3>Ticket Details</h3>
+            <hr />
+            <br />
+            <p>Issue: {data.issue}</p>
+            <p>
+              Logged By:
+              {` ${data.loggedBy?.firstName} ${data.loggedBy?.lastName} (${data.loggedBy?.email})`}
+            </p>
+            <p>
+              Logged For:
+              {data.loggedFor
+                ? ` ${data.loggedFor.firstName} ${data.loggedFor.lastName} (${data.loggedFor.email})`
+                : " N/A"}
+            </p>
+            <p>
+              Date Logged:{" "}
+              {moment(data.dateLogged).format(formatting.dateTimeFormat)}
+            </p>
+            <p>Department: {data.department}</p>
+            <p>Allocated To: {data.assignedTo?.email}</p>
+
+            {data.moreInfo.length > 0 && (
+              <>
+                <br />
+                <h3>More Info</h3> <hr />
+                <br />
+                {data.moreInfo?.map((moreInfo) => (
+                  <p>{`${moment(moreInfo.date).format(
+                    formatting.dateTimeFormat
+                  )} - ${moreInfo.details}`}</p>
+                ))}
+                <br />
+              </>
+            )}
+
+            <h3>Ticket Actions</h3>
+            <hr />
+            <br />
+            {/* ensure only support agents who are assigned to the ticket can amend it */}
+            {(availableActions && user.role !== "support") ||
+            (user.role === "support" &&
+              (!data.assignedTo || data.assignedTo._id === user._id)) ? (
+              availableActions.map((action) => {
+                // check if there is an amount of time that needs to have passed before this action can be ran
+                if (action.days) {
+                  debugger;
+                  let daysSince = moment().diff(lastStatus.date, "days");
+                  if (daysSince <= action.days) return;
+                }
+                return (
+                  <button
+                    onClick={() => {
+                      let fn = this[action.fnString]; //get function from string
+                      if (typeof fn === "function") fn(action.order); // belt and braces, check its definitely a function in case of future changes
+                    }}
+                    key={action.order}
+                    className="btn-default"
+                  >
+                    {action.name}
+                  </button>
+                );
+              })
+            ) : (
+              <h6>No Ticket Actions Available</h6>
+            )}
+
+            {/* if the ticket is complete let an admin delete it */}
+            {lastStatus?.availableActions?.length === 0 &&
+              user.role === "admin" && (
+                <button onClick={this.deleteTicket} className="btn-default">
+                  Delete Ticket
+                </button>
+              )}
+          </div>
+          <div className="col-md-6">
+            <h3>Current Status</h3>
+            <hr />
+            <br />
+            <p>Status: {lastStatus.currentStatus}</p>
+            <br />
+            <h3>Status History</h3>
+            <hr />
+            <br />
+
+            {/* @todo add custom sorter for date */}
+            <Table
+              // title="Status History"
+              columns={columns}
+              data={data.statusHistory || []}
+              key={"order"}
+              progressPending={this.state.loading}
+            />
+            <br />
+
+            <h3>Live Chat</h3>
+            <hr />
+            <br />
+
             <div className="row">
               <div className="col-md-6">
                 <Button onClick={this.showChatHistoryModal}>
@@ -408,69 +529,6 @@ export default class TicketDetails extends Component {
                   )}
               </div>
             </div>
-
-            <h3>Ticket Details</h3>
-            <br />
-            <p>Issue: {data.issue}</p>
-            <p>
-              Logged By:
-              {` ${data.loggedBy?.firstName} ${data.loggedBy?.lastName} (${data.loggedBy?.email})`}
-            </p>
-            <p>
-              Logged For:
-              {data.loggedFor
-                ? ` ${data.loggedFor.firstName} ${data.loggedFor.lastName} (${data.loggedFor.email})`
-                : " N/A"}
-            </p>
-            <p>
-              Date Logged:{" "}
-              {moment(data.dateLogged).format(formatting.dateTimeFormat)}
-            </p>
-            <p>Department: {data.department}</p>
-            <p>Allocated To: {data.assignedTo?.email}</p>
-
-            {data.moreInfo.length > 0 && (
-              <>
-                <br />
-                <h3>More Info</h3> <br />
-                {data.moreInfo?.map((moreInfo) => (
-                  <p>{`${moment(moreInfo.date).format(
-                    formatting.dateTimeFormat
-                  )} - ${moreInfo.details}`}</p>
-                ))}
-                <br />
-              </>
-            )}
-
-            {availableActions &&
-              availableActions.map((action) => (
-                <button
-                  onClick={() => {
-                    let fn = this[action.fnString]; //get function from string
-                    if (typeof fn === "function") fn(action.order); // belt and braces, check its definitely a function in case of future changes
-                  }}
-                  key={action.order}
-                  className="btn-default"
-                >
-                  {action.name}
-                </button>
-              ))}
-          </div>
-          <div className="col-md-6">
-            <h3>Current Status</h3>
-            <p>Status: {lastStatus.currentStatus}</p>
-            <br />
-            <h3>Status History</h3>
-            <br />
-
-            {/* @todo add custom sorter for date */}
-            <Table
-              // title="Status History"
-              columns={columns}
-              data={data.statusHistory || []}
-              key={"order"}
-              progressPending={this.state.loading}
-            />
           </div>
         </div>
         {/* <LoadingIndicator area="ticket-details-area" /> */}

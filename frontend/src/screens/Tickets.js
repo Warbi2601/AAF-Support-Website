@@ -44,7 +44,7 @@ const columns = [
     sortable: true,
   },
   {
-    name: "Assigned To",
+    name: "Allocated To",
     selector: (row) => row.assignedTo,
     sortable: true,
     cell: (row) => (
@@ -107,6 +107,11 @@ export default class Tickets extends Component {
         }
 
         allPropsEmpty = false; // we know there is some value at this point
+
+        //make sure we string match without case sensitivity
+        ticketValue = ticketValue?.toUpperCase();
+        value = value?.toUpperCase();
+
         if (key === "issue" || key === "department")
           return ticketValue.includes(value);
         return value === ticketValue;
@@ -137,9 +142,11 @@ export default class Tickets extends Component {
           onReset={this.resetSearch}
         />
 
-        <button onClick={this.showModal} className="btn-default">
-          {createTicketActionName}
-        </button>
+        {this.context.user.role !== "admin" && (
+          <button onClick={this.showModal} className="btn-default">
+            {createTicketActionName}
+          </button>
+        )}
 
         <Modal
           title={createTicketActionName}
