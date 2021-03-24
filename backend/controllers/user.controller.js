@@ -1,4 +1,6 @@
+const Ticket = require("../models/ticket.model");
 const User = require("../models/user.model");
+const mongoose = require("mongoose");
 
 exports.getUser = (req, res) => {
   let id = req.params.id;
@@ -41,17 +43,37 @@ exports.getAllUsers = (req, res) => {
 
 exports.deleteUser = (req, res) => {
   let userID = req.params.id;
-  User.deleteOne({ _id: userID }, function (err) {
-    if (err) {
-      res.status(500).json({
-        error: "Error deleting the user",
-      });
-    } else {
-      res.status(200).json({
-        success: "User successfully deleted",
-      });
+
+  //first delete all the tickets related to them
+  Ticket.deleteMany(
+    {
+      $or: [
+        { loggedFor: userID },
+        { loggedBy: userID },
+        { assignedTo: userID },
+      ],
+    },
+    (err) => {
+      if (err) {
+        res.status(500).json({
+          error: "Failed deleting the users tickets",
+        });
+      } else {
+        //then delete the user themselves if it was successful
+        User.deleteOne({ _id: userID }, function (userErr) {
+          if (userErr) {
+            res.status(500).json({
+              error: "Error deleting the user",
+            });
+          } else {
+            res.status(200).json({
+              success: "User successfully deleted",
+            });
+          }
+        });
+      }
     }
-  });
+  );
 };
 
 exports.updateUser = async (req, res) => {
