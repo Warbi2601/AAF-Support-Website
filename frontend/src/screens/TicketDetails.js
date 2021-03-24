@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import moment from "moment";
 import { toast } from "react-toastify";
 import { trackPromise } from "react-promise-tracker";
-
+import { Button } from "react-bootstrap";
 import { confirmAlert } from "react-confirm-alert";
 
 import { UserContext } from "../context/UserContext";
@@ -13,6 +13,9 @@ import formatting from "../utility/formatting";
 import Table from "../components/Table";
 import AddInformation from "./AddInformation";
 import Modal from "../components/Modal";
+import ChatHistory from "../components/chat/ChatHistory";
+// import { Button } from "bootstrap";
+import FormButton from "../components/forms/FormButton";
 
 export default class TicketDetails extends Component {
   static contextType = UserContext;
@@ -23,6 +26,7 @@ export default class TicketDetails extends Component {
       ticket: {},
       loading: true,
       addMoreInfoModalOpen: false,
+      chatHistoryModalOpen: false,
       addInfoComponent: null,
     };
   }
@@ -33,6 +37,14 @@ export default class TicketDetails extends Component {
 
   hideModal = () => {
     this.setState({ addMoreInfoModalOpen: false });
+  };
+
+  showChatHistoryModal = () => {
+    this.setState({ chatHistoryModalOpen: true });
+  };
+
+  hideChatHistoryModal = () => {
+    this.setState({ chatHistoryModalOpen: false });
   };
 
   confirmPopup = (onPressYes, title, message) => {
@@ -89,6 +101,17 @@ export default class TicketDetails extends Component {
           toast.error(err.response.data.error);
         })
     );
+  };
+
+  startLiveChat = () => {
+    const ticket = this.state.ticket;
+    const newChatID = Date.now();
+    this.props.history.push(`/room/${newChatID}/${ticket._id}`);
+  };
+
+  joinLiveChat = (chat) => {
+    const ticket = this.state.ticket;
+    this.props.history.push(`/room/${chat.chatID}/${ticket._id}`);
   };
 
   //#region Ticket Actions
@@ -253,7 +276,7 @@ export default class TicketDetails extends Component {
       Object.keys(data).length === 0 &&
       data.constructor === Object;
 
-    if (emptyTicketObj && !this.state.loading)
+    if (emptyTicketObj)
       return !this.state.loading ? (
         <div>
           <h1>Ticket Could Not Be Found</h1>
@@ -298,6 +321,37 @@ export default class TicketDetails extends Component {
       <div className="col-md-12">
         <div className="row">
           <div className="col-md-6" style={{ textAlign: "left" }}>
+            <div className="row">
+              <div className="col-md-6">
+                <Button onClick={this.showChatHistoryModal}>
+                  View Chat History
+                </Button>
+              </div>
+
+              <div className="col-md-6">
+                {/* if the user is a client let them start a new live chat */}
+                {user.role === "client" && (
+                  <Button onClick={this.startLiveChat}>
+                    Start New Live Chat
+                  </Button>
+                )}
+
+                {user.role === "support" &&
+                  data.chatHistory?.some((x) => x.active === true) && (
+                    // if the user is a support and there is an active live chat, let them join
+                    <Button
+                      onClick={() =>
+                        this.joinLiveChat(
+                          data.chatHistory?.find((x) => x.active === true)
+                        )
+                      }
+                    >
+                      Join Active Live Chat
+                    </Button>
+                  )}
+              </div>
+            </div>
+
             <h3>Ticket Details</h3>
             <br />
             <p>Issue: {data.issue}</p>
@@ -369,6 +423,15 @@ export default class TicketDetails extends Component {
           onHide={this.hideModal}
           show={this.state.addMoreInfoModalOpen}
           loaderName={"add-info-area"}
+        />
+
+        <Modal
+          title="Chat History"
+          BodyComponent={() => <ChatHistory chatHistory={data.chatHistory} />}
+          onHide={this.hideChatHistoryModal}
+          show={this.state.chatHistoryModalOpen}
+          loaderName={"add-info-area"}
+          size="lg"
         />
       </div>
     );

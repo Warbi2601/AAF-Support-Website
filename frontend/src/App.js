@@ -144,7 +144,10 @@ function App() {
                       component={WithAuth(AdminCenter, "admin")}
                     />
                     <Route path="/chatLobby" component={WithAuth(Lobby)} />
-                    <Route path="/room/:roomId" component={WithAuth(Room)} />
+                    <Route
+                      path="/room/:roomId/:ticketID"
+                      component={WithAuth(Room)}
+                    />
                   </Switch>
                 </div>
               </Col>

@@ -30,12 +30,14 @@ export default class CreateTicket extends Component {
     }
   }
 
+  actionID = this.props.forSelf ? 1 : 2; // If its the user logging it themseleves its 1, if its on behalf of a user its 2
+
   onSubmit = async (values, { resetForm }) => {
     trackPromise(
       axios
         .post(settings.apiUrl + "/tickets", {
           ticket: values,
-          action: actionID,
+          action: this.actionID,
         })
         .then((res) => {
           resetForm();
@@ -57,7 +59,6 @@ export default class CreateTicket extends Component {
 
   render() {
     const forSelf = this.props.forSelf;
-    const actionID = forSelf ? 1 : 2; // If its the user logging it themseleves its 1, if its on behalf of a user its 2
 
     const createTicketSchema = Yup.object().shape({
       issue: Yup.string().required().label("Issue"),

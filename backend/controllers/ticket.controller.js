@@ -33,6 +33,7 @@ exports.addTicket = (req, res) => {
       name: `${user.firstName} ${user.lastName} (${user.email})`,
     },
     availableActions: actionObj.availableActions,
+    currentStatus: actionObj.currentStatus,
   });
 
   const newTicket = new Ticket(ticket);
@@ -70,7 +71,7 @@ exports.getTicket = (req, res) => {
     // make sure that a user can't see a ticket that isn't their own
     if (
       user.role === "client" &&
-      (user._id === ticket.loggedBy._id || user._id === ticket.loggedFor._id)
+      (user._id === ticket.loggedBy?._id || user._id === ticket.loggedFor?._id)
     ) {
       return res.status(403).json({
         error: "You do not have permission to view this ticket",

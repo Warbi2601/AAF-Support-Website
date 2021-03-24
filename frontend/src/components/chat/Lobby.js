@@ -5,6 +5,8 @@ import "../../chat/lobby.css";
 const Lobby = () => {
   const [roomId, prepareRoom] = React.useState("");
 
+  const ticketID = "6048ea368277fe6d6ccb3b98";
+
   const onRoomIdChange = (event) => {
     prepareRoom(event.target.value);
   };
@@ -18,7 +20,7 @@ const Lobby = () => {
         onChange={onRoomIdChange}
         className="text-input-field"
       />
-      <Button variant="success" href={`/room/${roomId}`}>
+      <Button variant="success" href={`/room/${roomId}/${ticketID}`}>
         Join room
       </Button>
     </div>

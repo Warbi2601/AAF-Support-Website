@@ -11,6 +11,9 @@ import formatting from "../utility/formatting";
 import { UserContext } from "../context/UserContext";
 import TicketSearch from "../components/TicketSearch";
 
+import CheckCircleIcon from "@material-ui/icons/CheckCircle";
+import HighlightOffIcon from "@material-ui/icons/HighlightOff";
+
 const columns = [
   {
     name: "Issue",
@@ -50,7 +53,18 @@ const columns = [
   },
   {
     name: "Status",
-    selector: (row) => utility.statusToString(row.status),
+    selector: (row) =>
+      utility.getLatestTicketStatusByDate(row.statusHistory).currentStatus,
+    sortable: true,
+  },
+  {
+    name: "Awaiting Live Chat?",
+    selector: (row) =>
+      row.chatHistory.some((x) => x.active === true) ? (
+        <CheckCircleIcon htmlColor="green" />
+      ) : (
+        <HighlightOffIcon htmlColor="red" />
+      ),
     sortable: true,
   },
 ];
@@ -139,17 +153,6 @@ export default class Tickets extends Component {
 
         <br />
         <br />
-
-        {/* <Modal show={this.state.modalOpen} onHide={this.hideModal}>
-          <Modal.Header>
-            <Modal.Title>Hi</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>The body</Modal.Body>
-          <Modal.Footer>
-            <button onClick={this.hideModal}>Cancel</button>
-            <button>Save</button>
-          </Modal.Footer>
-        </Modal> */}
 
         <Table
           title="Tickets"

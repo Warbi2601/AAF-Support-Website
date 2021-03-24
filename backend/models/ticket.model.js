@@ -36,6 +36,11 @@ const ticketSchema = new Schema(
     moreInfo: {
       type: [Schema.Types.Mixed],
     },
+    chatHistory: {
+      type: [Schema.Types.Mixed],
+      required: false,
+      default: [],
+    },
   },
   {
     collection: "tickets",

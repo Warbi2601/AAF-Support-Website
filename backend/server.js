@@ -8,6 +8,7 @@ const middleware = require("./middleware");
 const createError = require("http-errors");
 var logger = require("morgan");
 require("dotenv").config();
+var ChatController = require("./controllers/chat.controller");
 
 // Connecting Database
 mongoose.Promise = global.Promise;
@@ -65,11 +66,27 @@ io.on("connection", (socket) => {
   // Listen for new messages
   socket.on(newchatmsg, (data) => {
     io.in(roomId).emit(newchatmsg, data);
+
+    const { body, chatID, ticketID, userID, userName, dateSent } = data;
+
+    //save messages to an array here
+    ChatController.saveTicketChat(
+      ticketID,
+      chatID,
+      userID,
+      userName,
+      dateSent,
+      body
+    );
   });
 
   // Leave the room if the user closes the socket
   socket.on("disconnect", () => {
     console.log(`Client ${socket.id} diconnected`);
+
+    //mark chat as complete
+    ChatController.endChat(roomId);
+
     socket.leave(roomId);
   });
 });

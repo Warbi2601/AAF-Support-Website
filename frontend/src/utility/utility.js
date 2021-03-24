@@ -83,9 +83,11 @@ const getAvailableActionsForTicket = (allUserActions, lastStatus) => {
 };
 
 const getLatestTicketStatusByDate = (statusHistory) => {
-  return statusHistory.reduce((r, a) =>
+  debugger;
+  var a = statusHistory.reduce((r, a) =>
     new Date(r.date) > new Date(a.date) ? r : a
   );
+  return a;
 };
 
 const capitalize = (s) => {

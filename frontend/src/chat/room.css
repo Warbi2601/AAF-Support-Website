@@ -61,3 +61,12 @@
 .send-message-button {
   border-color: #9a9a9a;
 }
+
+.message-username {
+  font-size: 14px;
+  color: #9a9a9a;
+  font-weight: bold;
+}
+
+/* .message-content {
+} */

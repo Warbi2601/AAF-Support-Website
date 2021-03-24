@@ -12,6 +12,7 @@ function Modal({
   BodyComponent,
   FooterComponent,
   loaderName,
+  ...otherProps
 }) {
   return (
     <BootstrapModal
@@ -19,6 +20,7 @@ function Modal({
       onHide={onHide}
       backdrop={backdrop}
       keyboard={keyboard}
+      {...otherProps}
     >
       <BootstrapModal.Header closeButton>
         <BootstrapModal.Title>{title}</BootstrapModal.Title>

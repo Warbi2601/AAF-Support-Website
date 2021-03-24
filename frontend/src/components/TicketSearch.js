@@ -49,27 +49,6 @@ function TicketSearch({ onSubmit, onReset }) {
       initialValues={initialValues}
       validationSchema={searchTicketsSchema}
       onSubmit={onSubmit}
-      //   onSubmit={
-      //       async (values, { resetForm }) => {
-      //     if (values.loggedFor === "") delete values.loggedFor;
-      //     trackPromise(
-      //       axios
-      //         .post(settings.apiUrl + "/tickets", {
-      //           ticket: values,
-      //           action: actionID,
-      //         })
-      //         .then((res) => {
-      //           resetForm();
-      //           toast.success(res.data.success);
-      //           this.props.history.push("/ticket-details/" + res.data.ticketID);
-      //         })
-      //         .catch((err) => {
-      //           toast.error(err.response.data.error);
-      //         }),
-      //       "create-ticket-area"
-      //     );
-      //   }
-      //}
     >
       {(formik) => {
         console.log("FORMIK", formik);
