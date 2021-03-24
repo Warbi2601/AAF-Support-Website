@@ -1,28 +1,48 @@
-import React, { Component } from "react";
+import React, { useEffect, useState } from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 import "../styles/Form.scss";
+import settings from "../settings/settings";
 import FormField from "../components/forms/FormField";
 import FormButton from "../components/forms/FormButton";
 
 const AllocateTicket = ({
   action,
-  currentAllocatedToID,
+  currentAssignedToID,
   onSubmit,
   isReallocate = false,
 }) => {
+  const [users, setUsers] = useState([]);
+
+  const getUsers = () => {
+    axios
+      .get(settings.apiUrl + "/users")
+      .then((res) => {
+        setUsers(res.data);
+      })
+      .catch((err) => {
+        toast.error(err.response.data.error);
+      });
+  };
+
+  useEffect(() => {
+    getUsers();
+  }, []);
+
+  const label = isReallocate ? "Reallocate To" : "Allocate To";
+
   const allocateTicketSchema = Yup.object().shape({
-    allocatedTo: Yup.string().required().label("Allocated To"),
+    assignedTo: Yup.string().required().label(label),
     action: Yup.number().required(),
   });
 
   const initialValues = {
-    allocatedTo: currentAllocatedToID || "",
+    assignedTo: currentAssignedToID || "",
     action: action,
   };
-
-  const label = isReallocate ? "Reallocate To" : "Allocate To";
 
   return (
     <Formik
@@ -37,7 +57,7 @@ const AllocateTicket = ({
               <Form>
                 <FormField
                   formik={formik}
-                  name="allocatedTo"
+                  name="assignedTo"
                   label={label}
                   as="select"
                 >
@@ -51,7 +71,7 @@ const AllocateTicket = ({
                 </FormField>
                 <FormField
                   formik={formik}
-                  value={this.props.action}
+                  // value={action}
                   name="action"
                   hidden
                 />

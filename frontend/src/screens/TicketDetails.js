@@ -51,11 +51,11 @@ export default class TicketDetails extends Component {
   };
 
   showAllocateModal = () => {
-    this.setState({ chatHistoryModalOpen: true });
+    this.setState({ allocateModalOpen: true });
   };
 
   hideAllocateModal = () => {
-    this.setState({ chatHistoryModalOpen: false });
+    this.setState({ allocateModalOpen: false });
   };
 
   confirmPopup = (onPressYes, title, message) => {
@@ -207,7 +207,7 @@ export default class TicketDetails extends Component {
       allocateComponent: (
         <AllocateTicket
           action={action}
-          currentAllocatedToID={this.state.ticket.assignedTo}
+          currentAssignedToID={this.state.ticket.assignedTo._id}
           isReallocate={true}
           onSubmit={(values) =>
             this.reallocateSubmit(values, "Ticket Reallocated")
@@ -222,12 +222,12 @@ export default class TicketDetails extends Component {
     let ticket = Object.assign({}, this.state.ticket); // creating mutable copy of state variable ticket
 
     //validation
-    if (ticket.allocatedTo === values.allocatedTo) {
+    if (ticket.assignedTo === values.assignedTo) {
       toast.error("That support agent is already allocated to this ticket");
       return;
     }
 
-    ticket.allocatedTo = values.allocatedTo;
+    ticket.assignedTo = values.assignedTo;
     this.hideAllocateModal();
     this.updateTicket(ticket, values.action, successMsg);
   };
@@ -304,13 +304,14 @@ export default class TicketDetails extends Component {
   };
 
   allocateToSupportSubmit = (values, successMsg) => {
+    debugger;
     let ticket = Object.assign({}, this.state.ticket); // creating mutable copy of state variable ticket
 
     //set
-    ticket.allocatedTo = values.allocatedTo;
+    ticket.assignedTo = values.assignedTo;
 
     //hide and update
-    this.hideReallocateModal();
+    this.hideAllocateModal();
     this.updateTicket(ticket, values.action, successMsg);
   };
 
@@ -479,6 +480,14 @@ export default class TicketDetails extends Component {
           onHide={this.hideModal}
           show={this.state.addMoreInfoModalOpen}
           loaderName={"add-info-area"}
+        />
+
+        <Modal
+          title="Allocate Ticket"
+          BodyComponent={() => this.state.allocateComponent}
+          onHide={this.hideAllocateModal}
+          show={this.state.allocateModalOpen}
+          loaderName={"allocate-area"}
         />
 
         <Modal

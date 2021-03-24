@@ -4,6 +4,7 @@ import { UserContext } from "../context/UserContext";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import websiteLogo from "../images/logo.png";
 import NavLink from "./navigation/NavLink";
+import utility from "../utility/utility";
 
 const Navigation = () => {
   const { user } = useContext(UserContext);
@@ -59,7 +60,9 @@ const Navigation = () => {
             ) : (
               <>
                 <div className="nav-link global-username">
-                  {`${user.firstName} ${user.lastName} - ${user.role}`}
+                  {`${user.firstName} ${user.lastName} - ${utility.capitalize(
+                    user.role
+                  )}`}
                 </div>
                 <Nav.Link as={Link} to={"/logout"}>
                   <button type="button" class="btn btn-primary">
