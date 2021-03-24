@@ -16,6 +16,7 @@ import Modal from "../components/Modal";
 import ChatHistory from "../components/chat/ChatHistory";
 // import { Button } from "bootstrap";
 import FormButton from "../components/forms/FormButton";
+import AllocateTicket from "../components/AllocateTicket";
 
 export default class TicketDetails extends Component {
   static contextType = UserContext;
@@ -27,7 +28,9 @@ export default class TicketDetails extends Component {
       loading: true,
       addMoreInfoModalOpen: false,
       chatHistoryModalOpen: false,
+      allocateModalOpen: false,
       addInfoComponent: null,
+      allocateComponent: null,
     };
   }
 
@@ -44,6 +47,14 @@ export default class TicketDetails extends Component {
   };
 
   hideChatHistoryModal = () => {
+    this.setState({ chatHistoryModalOpen: false });
+  };
+
+  showAllocateModal = () => {
+    this.setState({ chatHistoryModalOpen: true });
+  };
+
+  hideAllocateModal = () => {
     this.setState({ chatHistoryModalOpen: false });
   };
 
@@ -192,6 +203,33 @@ export default class TicketDetails extends Component {
 
   reallocateTicket = (action) => {
     //render a modal to select the support agent to allocate to
+    this.setState({
+      allocateComponent: (
+        <AllocateTicket
+          action={action}
+          currentAllocatedToID={this.state.ticket.assignedTo}
+          isReallocate={true}
+          onSubmit={(values) =>
+            this.reallocateSubmit(values, "Ticket Reallocated")
+          }
+        />
+      ),
+      allocateModalOpen: true,
+    });
+  };
+
+  reallocateSubmit = (values, successMsg) => {
+    let ticket = Object.assign({}, this.state.ticket); // creating mutable copy of state variable ticket
+
+    //validation
+    if (ticket.allocatedTo === values.allocatedTo) {
+      toast.error("That support agent is already allocated to this ticket");
+      return;
+    }
+
+    ticket.allocatedTo = values.allocatedTo;
+    this.hideAllocateModal();
+    this.updateTicket(ticket, values.action, successMsg);
   };
 
   solveTicket = (action) => {
@@ -251,7 +289,29 @@ export default class TicketDetails extends Component {
   //#region Admin
 
   allocateToSupport = (action) => {
-    //render same reallocate modal
+    //render a modal to select the support agent to allocate to
+    this.setState({
+      allocateComponent: (
+        <AllocateTicket
+          action={action}
+          onSubmit={(values) =>
+            this.allocateToSupportSubmit(values, "Ticket Allocated")
+          }
+        />
+      ),
+      allocateModalOpen: true,
+    });
+  };
+
+  allocateToSupportSubmit = (values, successMsg) => {
+    let ticket = Object.assign({}, this.state.ticket); // creating mutable copy of state variable ticket
+
+    //set
+    ticket.allocatedTo = values.allocatedTo;
+
+    //hide and update
+    this.hideReallocateModal();
+    this.updateTicket(ticket, values.action, successMsg);
   };
 
   closeExpiredTicket = (action) => {
@@ -290,14 +350,10 @@ export default class TicketDetails extends Component {
 
     const lastStatus = utility.getLatestTicketStatusByDate(data.statusHistory);
 
-    console.log("LAST STATUS", lastStatus);
-
     const availableActions = utility.getAvailableActionsForTicket(
       allUserActions,
       lastStatus
     );
-
-    console.log("AVAILABLE ACTIONS FOR USER", availableActions);
 
     const columns = [
       {

@@ -33,12 +33,12 @@ const Room = (props) => {
 
       {user.role === "client" && (
         <h6>
-          Please send a message to notify a support agent that you require
-          assistance. Please note that the agent won't be able to read any
-          messages sent before they join, wait for them to reply before
-          detailing your issue. (navigating away from this page will end this
-          live chat however you will still be able to see the history on the
-          ticket details screen)
+          Please note that the agent won't be able to read any messages sent
+          before they join, wait for them to connect before detailing your
+          issue. (navigating away from this page will end this live chat however
+          you can return to it by pressing back on your browser if it was done
+          in error. You will still be able to see the history of this chat on
+          the ticket details screen)
         </h6>
       )}
       <div className="messages-container">
@@ -49,7 +49,9 @@ const Room = (props) => {
               <li
                 key={i}
                 className={`message-item ${
-                  message.ownedByCurrentUser ? "my-message" : "received-message"
+                  message.userID === user._id
+                    ? "my-message"
+                    : "received-message"
                 }`}
               >
                 <div className="message-username">
@@ -62,12 +64,15 @@ const Room = (props) => {
           })}
         </ol>
       </div>
+      <br />
       <textarea
         value={newMessage}
         onChange={handleNewMessageChange}
         placeholder="Write a message..."
         className="new-message-input-field"
       />
+      <br />
+
       <Button
         variant="success"
         onClick={handleSendMessage}

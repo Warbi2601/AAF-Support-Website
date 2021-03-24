@@ -55,38 +55,50 @@ const io = require("socket.io")(chatServer, {
 
 const PORT = 4000;
 const newchatmsg = "newMsg";
+const chatDisconnect = "chat-disconnect";
+const chatConnect = "chat-connect";
 
 io.on("connection", (socket) => {
-  console.log(`Client ${socket.id} connected`);
-
   // Join a conversation
   const { roomId } = socket.handshake.query;
   socket.join(roomId);
+
+  console.log(`Client ${socket.id} connected to room ${roomId}`);
 
   // Listen for new messages
   socket.on(newchatmsg, (data) => {
     io.in(roomId).emit(newchatmsg, data);
 
-    const { body, chatID, ticketID, userID, userName, dateSent } = data;
+    //save messages to an array here
+    ChatController.saveTicketChat(data);
+  });
+
+  socket.on(chatConnect, (data) => {
+    console.log("chat-connect", data);
+    io.in(roomId).emit(chatConnect, data);
 
     //save messages to an array here
-    ChatController.saveTicketChat(
-      ticketID,
-      chatID,
-      userID,
-      userName,
-      dateSent,
-      body
-    );
+    ChatController.saveTicketChat(data);
+  });
+
+  // Tell all other users in the room if one closes the socket
+  socket.on(chatDisconnect, (data) => {
+    console.log("chat-disconnect", data);
+
+    //save messages to an array here
+    //mark chat as complete if the user (client) who created the chat is the one who has disconnected
+    ChatController.saveTicketChat(data, true);
+
+    // const { ticketID, userID } = data;
+
+    // ChatController.endChat(ticketID, roomId, userID); //roomId is chatID
+
+    io.in(roomId).emit(chatDisconnect, data);
   });
 
   // Leave the room if the user closes the socket
-  socket.on("disconnect", () => {
+  socket.on("disconnect", (data) => {
     console.log(`Client ${socket.id} diconnected`);
-
-    //mark chat as complete
-    ChatController.endChat(roomId);
-
     socket.leave(roomId);
   });
 });

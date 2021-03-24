@@ -9,79 +9,69 @@ const Navigation = () => {
   const { user } = useContext(UserContext);
 
   return (
-    <>
-      <Navbar collapseOnSelect fixed="top" expand="lg" bg="dark" variant="dark">
-        <Container>
-          <Navbar.Brand as={Link} to={"/home"}>
-            <img src={websiteLogo} style={{ height: "43px", width: "43px" }} />
-            <span className="navTitle">Uni-Desk</span>
-          </Navbar.Brand>
-          <Navbar.Toggle aria-controls="responsive-navbar-nav" />
-          <Navbar.Collapse id="responsive-navbar-nav">
-            {/* <Nav> */}
-            <Nav className="mr-auto main-nav">
-              <Nav.Link as={NavLink} to={"/home"}>
-                Home
-              </Nav.Link>
+    <Navbar collapseOnSelect fixed="top" expand="lg" bg="dark" variant="dark">
+      <Container>
+        <Navbar.Brand as={Link} to={"/home"}>
+          <img src={websiteLogo} style={{ height: "43px", width: "43px" }} />
+          <span className="navTitle">Uni-Desk</span>
+        </Navbar.Brand>
+        <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+        <Navbar.Collapse id="responsive-navbar-nav">
+          {/* <Nav> */}
+          <Nav className="mr-auto main-nav">
+            <Nav.Link as={NavLink} to={"/home"}>
+              Home
+            </Nav.Link>
 
-              {user && (
-                <>
-                  <Nav.Link as={NavLink} to={"/tickets"}>
-                    Tickets
-                  </Nav.Link>
-                  <Nav.Link as={NavLink} to={"/chatLobby"}>
+            {user && (
+              <>
+                <Nav.Link as={NavLink} to={"/tickets"}>
+                  Tickets
+                </Nav.Link>
+                {/* <Nav.Link as={NavLink} to={"/chatLobby"}>
                     Chat Lobby
-                  </Nav.Link>
-                </>
-              )}
+                  </Nav.Link> */}
+              </>
+            )}
 
-              {!user ||
-                (user.role === "admin" && (
-                  <Nav.Link as={NavLink} to={"/admin-center"}>
-                    Admin Center
-                  </Nav.Link>
-                ))}
-            </Nav>
-            <Nav>
-              {!user ? (
-                <>
-                  <Nav.Link as={Link} to={"/login"}>
-                    {/* <button className="btn-default btn-">Login</button> */}
-                    <button type="button" class="btn btn-primary">
-                      Login
-                    </button>
-                  </Nav.Link>
-                  <Nav.Link as={Link} to={"/register"}>
-                    <button type="button" class="btn btn-outline-primary">
-                      Register
-                    </button>
-                  </Nav.Link>
-                </>
-              ) : (
+            {!user ||
+              (user.role === "admin" && (
+                <Nav.Link as={NavLink} to={"/admin-center"}>
+                  Admin Center
+                </Nav.Link>
+              ))}
+          </Nav>
+          <Nav>
+            {!user ? (
+              <>
+                <Nav.Link as={Link} to={"/login"}>
+                  {/* <button className="btn-default btn-">Login</button> */}
+                  <button type="button" class="btn btn-primary">
+                    Login
+                  </button>
+                </Nav.Link>
+                <Nav.Link as={Link} to={"/register"}>
+                  <button type="button" class="btn btn-outline-primary">
+                    Register
+                  </button>
+                </Nav.Link>
+              </>
+            ) : (
+              <>
+                <div className="nav-link global-username">
+                  {`${user.firstName} ${user.lastName} - ${user.role}`}
+                </div>
                 <Nav.Link as={Link} to={"/logout"}>
                   <button type="button" class="btn btn-primary">
                     Logout
                   </button>
                 </Nav.Link>
-              )}
-            </Nav>
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
-      {/* @todo Remove this debugger */}
-      <p
-        style={{
-          fontSize: "10px",
-          margin: 0,
-          position: "absolute",
-          top: 30,
-          left: 15,
-          zIndex: 9999,
-        }}
-      >
-        {user && `Logged in as ${user?.role}`}
-      </p>
-    </>
+              </>
+            )}
+          </Nav>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
   );
 };
 

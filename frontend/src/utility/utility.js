@@ -83,7 +83,6 @@ const getAvailableActionsForTicket = (allUserActions, lastStatus) => {
 };
 
 const getLatestTicketStatusByDate = (statusHistory) => {
-  debugger;
   var a = statusHistory.reduce((r, a) =>
     new Date(r.date) > new Date(a.date) ? r : a
   );
