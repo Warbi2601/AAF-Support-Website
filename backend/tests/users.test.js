@@ -13,7 +13,7 @@ const supportID = process.env.SUPPORT_ID;
 
 const endpoint = "/api/users";
 
-const testUserID = "605c88ab3ee9df51283c6dc0";
+const testUserID = "605c8e2d57301d730cbaa8cb"; // this will need updating as it gets deleted
 
 chai.use(chaiHttp);
 let currentResponse = null; // for console logging responses when debugging
@@ -145,34 +145,34 @@ describe("Users", () => {
   });
 
   describe("POST/", () => {
-    // it("Creating a valid new user returns 200 and user object - WARNING: User will need to be deleted after otherwise next time it will throw a duplicate email error", (done) => {
-    //   let newUser = {
-    //     email: "aaa@aaa.com",
-    //     password: "qwerty",
-    //     firstName: "aaa",
-    //     lastName: "aaa",
-    //     role: "client",
-    //   };
-    //   chai
-    //     .request(server)
-    //     .post("/auth/register")
-    //     .send(newUser)
-    //     .end((err, res) => {
-    //       currentResponse = res;
-    //       res.should.have.status(200);
-    //       res.body.user.should.be.a("object");
-    //       res.body.user.should.have.property("_id");
-    //       res.body.user.should.have.property("role");
-    //       res.body.user.should.have.property("email");
-    //       res.body.user.should.have.property("firstName");
-    //       res.body.user.should.have.property("lastName");
-    //       res.body.user.should.not.have.property("password");
-    //       res.body.should.have
-    //         .property("success")
-    //         .eql("Registered Successfully");
-    //       done();
-    //     });
-    // });
+    it("Creating a valid new user returns 200 and user object - WARNING: User will need to be deleted after otherwise next time it will throw a duplicate email error", (done) => {
+      let newUser = {
+        email: "aaa@aaa.com",
+        password: "qwerty",
+        firstName: "aaa",
+        lastName: "aaa",
+        role: "client",
+      };
+      chai
+        .request(server)
+        .post("/auth/register")
+        .send(newUser)
+        .end((err, res) => {
+          currentResponse = res;
+          res.should.have.status(200);
+          res.body.user.should.be.a("object");
+          res.body.user.should.have.property("_id");
+          res.body.user.should.have.property("role");
+          res.body.user.should.have.property("email");
+          res.body.user.should.have.property("firstName");
+          res.body.user.should.have.property("lastName");
+          res.body.user.should.not.have.property("password");
+          res.body.should.have
+            .property("success")
+            .eql("Registered Successfully");
+          done();
+        });
+    });
 
     it("Creating a new user with invalid data returns 400", (done) => {
       let newUser = {
@@ -234,9 +234,59 @@ describe("Users", () => {
           res.body.should.have.property("firstName");
           res.body.should.have.property("lastName");
           res.body.should.not.have.property("password");
-          // res.body.should.have
-          //   .property("success")
-          //   .eql("Registered Successfully");
+          done();
+        });
+    });
+  });
+
+  describe("PUT/", () => {
+    it("Client update valid user return 403", (done) => {
+      let newUserDetails = {
+        password: "qqqq",
+        role: "admin",
+      };
+      chai
+        .request(server)
+        .put(`${endpoint}/${testUserID}`)
+        .send(newUserDetails)
+        .set("x-access-token", clientToken)
+        .end((err, res) => {
+          currentResponse = res;
+          res.should.have.status(403);
+          done();
+        });
+    });
+
+    it("Support update valid user return 403", (done) => {
+      let newUserDetails = {
+        password: "qqqq",
+        role: "admin",
+      };
+      chai
+        .request(server)
+        .put(`${endpoint}/${testUserID}`)
+        .send(newUserDetails)
+        .set("x-access-token", supportToken)
+        .end((err, res) => {
+          currentResponse = res;
+          res.should.have.status(403);
+          done();
+        });
+    });
+
+    it("Admin update valid user return 200", (done) => {
+      let newUserDetails = {
+        password: "puttest",
+        role: "admin",
+      };
+      chai
+        .request(server)
+        .put(`${endpoint}/${testUserID}`)
+        .send(newUserDetails)
+        .set("x-access-token", adminToken)
+        .end((err, res) => {
+          currentResponse = res;
+          res.should.have.status(200);
           done();
         });
     });
@@ -267,16 +317,16 @@ describe("Users", () => {
         });
     });
 
-    // it("Admin delete valid user return 200", (done) => {
-    //   chai
-    //     .request(server)
-    //     .delete(`${endpoint}/${testUserID}`)
-    //     .set("x-access-token", adminToken)
-    //     .end((err, res) => {
-    //       currentResponse = res;
-    //       res.should.have.status(200);
-    //       done();
-    //     });
-    // });
+    it("Admin delete valid user return 200", (done) => {
+      chai
+        .request(server)
+        .delete(`${endpoint}/${testUserID}`)
+        .set("x-access-token", adminToken)
+        .end((err, res) => {
+          currentResponse = res;
+          res.should.have.status(200);
+          done();
+        });
+    });
   });
 });

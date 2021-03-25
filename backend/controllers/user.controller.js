@@ -101,23 +101,29 @@ exports.updateUser = async (req, res) => {
           error: "Internal error please try again",
         });
       } else {
-        // build up the success message to be clear on what has been updated
-        let successMsg = "";
-        if (password) {
-          user.password = password;
-          successMsg = "Password updated";
-        }
-        if (role) {
-          user.role = role;
-          successMsg = "Role updated";
-        }
-        if (password && role) successMsg = "Password and role updated";
+        if (!user) {
+          res.status(404).json({
+            error: "User not found",
+          });
+        } else {
+          // build up the success message to be clear on what has been updated
+          let successMsg = "";
+          if (password) {
+            user.password = password;
+            successMsg = "Password updated";
+          }
+          if (role) {
+            user.role = role;
+            successMsg = "Role updated";
+          }
+          if (password && role) successMsg = "Password and role updated";
 
-        user.save();
+          user.save();
 
-        res.status(200).json({
-          success: successMsg,
-        });
+          res.status(200).json({
+            success: successMsg,
+          });
+        }
       }
     });
 
