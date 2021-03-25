@@ -1,6 +1,6 @@
 import React from "react";
 
-function FormButton({ title, formik }) {
+function FormButton({ title, formik, children }) {
   return (
     <button
       type="submit"
@@ -11,6 +11,7 @@ function FormButton({ title, formik }) {
       }
       disabled={!(formik.dirty && formik.isValid) || formik.isSubmitting}
     >
+      {children}
       {title}
     </button>
   );

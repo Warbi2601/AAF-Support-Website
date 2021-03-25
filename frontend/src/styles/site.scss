@@ -33,6 +33,26 @@ body,
   padding-top: 70px;
 }
 
+.card {
+  background-color: $base-bgcolor !important;
+  border: 1px solid $color-off-white !important;
+}
+
+.card {
+  .card-body label {
+    color: $base-color;
+  }
+
+  .cardHeaderBtn {
+    width: auto;
+    float: right;
+  }
+}
+
+button .MuiSvgIcon-root {
+  margin-right: 10px;
+}
+
 .App-header > nav.navbar > div.container {
   .navTitle {
     padding-left: 15px;
@@ -107,12 +127,16 @@ select:focus {
 }
 
 .error {
-  color: $colorDanger;
+  color: $base-btn-color;
 }
 
 //needed to fix datatable bug
 .iRVWcQ {
   overflow: initial !important;
+}
+
+.boldTitle {
+  font-weight: bold;
 }
 
 .globalLoader {
@@ -144,7 +168,7 @@ select:focus {
   color: #fff;
   width: 100%;
   font-size: 1.4rem;
-  background: #f04b4c;
+  background: #f04b4c !important;
   border-radius: 15px !important;
   border: none;
   cursor: pointer;

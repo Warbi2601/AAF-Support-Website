@@ -1,18 +1,20 @@
 import axios from "axios";
 import React, { Component } from "react";
 import moment from "moment";
+import { toast } from "react-toastify";
+import CheckCircleIcon from "@material-ui/icons/CheckCircle";
+import HighlightOffIcon from "@material-ui/icons/HighlightOff";
+import CreateIcon from "@material-ui/icons/Create";
+import { Card } from "react-bootstrap";
+
 import settings from "../settings/settings";
 import Table from "../components/Table";
 import utility from "../utility/utility";
-import { toast } from "react-toastify";
 import Modal from "../components/Modal";
 import CreateTicket from "./CreateTicket";
 import formatting from "../utility/formatting";
 import { UserContext } from "../context/UserContext";
 import TicketSearch from "../components/TicketSearch";
-
-import CheckCircleIcon from "@material-ui/icons/CheckCircle";
-import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 
 const columns = [
   {
@@ -63,7 +65,7 @@ const columns = [
       row.chatHistory.some((x) => x.active === true) ? (
         <CheckCircleIcon htmlColor="green" />
       ) : (
-        <HighlightOffIcon htmlColor="red" />
+        <HighlightOffIcon className="error" />
       ),
     sortable: true,
   },
@@ -137,16 +139,55 @@ export default class Tickets extends Component {
       : "Create Ticket For User";
     return (
       <div>
-        <TicketSearch
-          onSubmit={this.searchTickets}
-          onReset={this.resetSearch}
-        />
+        <Card>
+          <Card.Header>
+            <h3>Search Tickets</h3>
+          </Card.Header>
+          <Card.Body>
+            {/* <Card.Text>
+              Some quick example text to build on the card title and make up the
+              bulk of the card's content.
+            </Card.Text> */}
+            <TicketSearch
+              onSubmit={this.searchTickets}
+              onReset={this.resetSearch}
+            />
+          </Card.Body>
+        </Card>
 
-        {this.context.user.role !== "admin" && (
-          <button onClick={this.showModal} className="btn-default">
-            {createTicketActionName}
-          </button>
-        )}
+        <br />
+
+        <Card>
+          <Card.Header>
+            <h3>Tickets</h3>
+          </Card.Header>
+          <Card.Body>
+            {this.context.user.role !== "admin" && (
+              <button
+                onClick={this.showModal}
+                className="btn-default cardHeaderBtn"
+              >
+                <CreateIcon />
+                {createTicketActionName}
+              </button>
+            )}
+
+            <br />
+
+            <br />
+            <br />
+
+            <Table
+              columns={columns}
+              data={data}
+              progressPending={this.state.loading}
+              onRowClicked={(item) => {
+                this.props.history.push("/ticket-details/" + item._id);
+                console.log(item);
+              }}
+            />
+          </Card.Body>
+        </Card>
 
         <Modal
           title={createTicketActionName}
@@ -156,20 +197,6 @@ export default class Tickets extends Component {
           onHide={this.hideModal}
           show={this.state.modalOpen}
           loaderName={"create-ticket-area"}
-        />
-
-        <br />
-        <br />
-
-        <Table
-          title="Tickets"
-          columns={columns}
-          data={data}
-          progressPending={this.state.loading}
-          onRowClicked={(item) => {
-            this.props.history.push("/ticket-details/" + item._id);
-            console.log(item);
-          }}
         />
       </div>
     );

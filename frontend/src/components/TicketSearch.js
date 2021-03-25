@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import CachedIcon from "@material-ui/icons/Cached";
+import SearchIcon from "@material-ui/icons/Search";
 
 import "../styles/Form.scss";
 import FormField from "../components/forms/FormField";
@@ -20,6 +21,7 @@ const initialValues = {
 };
 
 const searchTicketsSchema = Yup.object().shape({
+  //not needed
   // issue: Yup.string().required().label("Issue"),
   // loggedFor: forSelf
   //   ? Yup.string().label("Logged on behalf of")
@@ -133,15 +135,18 @@ function TicketSearch({ onSubmit, onReset }) {
 
                 <div className="row">
                   <div className="col-md-3">
-                    <FormButton title="Search Tickets" formik={formik} />
+                    <FormButton title="Search" formik={formik}>
+                      <SearchIcon />
+                    </FormButton>
                   </div>
                   <div className="col-md-3">
                     <button
                       type="button"
-                      className="btn btn-success"
+                      className="btn btn-default"
                       onClick={() => onReset(formik.resetForm)}
                     >
                       <CachedIcon />
+                      Reset
                     </button>
                   </div>
                 </div>

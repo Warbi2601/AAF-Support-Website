@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import moment from "moment";
 import { toast } from "react-toastify";
 import { trackPromise } from "react-promise-tracker";
-import { Button } from "react-bootstrap";
+import { Button, Card } from "react-bootstrap";
 import { confirmAlert } from "react-confirm-alert";
 
 import { UserContext } from "../context/UserContext";
@@ -177,8 +177,13 @@ export default class TicketDetails extends Component {
   };
 
   addMoreInfoSubmit = (values, successMsg) => {
+    let user = this.context.user;
     let ticket = Object.assign({}, this.state.ticket); // creating copy of state variable ticket
-    ticket.moreInfo.push({ date: new Date(), details: values.moreInfo });
+    ticket.moreInfo.push({
+      date: new Date(),
+      details: values.moreInfo,
+      userName: `${user?.firstName} ${user?.lastName}`,
+    });
     this.hideModal();
     this.updateTicket(ticket, values.action, successMsg);
   };
@@ -400,138 +405,188 @@ export default class TicketDetails extends Component {
     return (
       <div className="col-md-12">
         <div className="row">
-          <div className="col-md-6" style={{ textAlign: "left" }}>
-            <h3>Ticket Details</h3>
-            <hr />
+          <div className="col-md-7">
+            <Card>
+              <Card.Header>
+                <h3>Ticket Details</h3>
+              </Card.Header>
+              <Card.Body style={{ textAlign: "left" }}>
+                <p>
+                  <span className="boldTitle">Issue: </span>
+                  {data.issue}
+                </p>
+                <p>
+                  <span className="boldTitle">Logged By: </span>
+                  {` ${data.loggedBy?.firstName} ${data.loggedBy?.lastName} (${data.loggedBy?.email})`}
+                </p>
+                <p>
+                  <span className="boldTitle">Logged For: </span>
+                  {data.loggedFor
+                    ? ` ${data.loggedFor.firstName} ${data.loggedFor.lastName} (${data.loggedFor.email})`
+                    : " N/A"}
+                </p>
+                <p>
+                  <span className="boldTitle">Date Logged: </span>
+                  {moment(data.dateLogged).format(formatting.dateTimeFormat)}
+                </p>
+
+                <p>
+                  <span className="boldTitle">Department: </span>
+                  {data.department}
+                </p>
+                <p>
+                  <span className="boldTitle">Allocated To: </span>
+                  {data.assignedTo?.email}
+                </p>
+
+                {data.moreInfo.length > 0 && (
+                  <>
+                    <br />
+                    <h4>More Information</h4> <hr />
+                    {data.moreInfo?.map((moreInfo) => (
+                      <p>
+                        <span className="boldTitle">
+                          {`${moreInfo.userName || ""} - ${moment(
+                            moreInfo.date
+                          ).format(formatting.dateTimeFormat)}`}
+                        </span>
+                        {` - ${moreInfo.details}`}
+                      </p>
+                    ))}
+                    <br />
+                  </>
+                )}
+              </Card.Body>
+            </Card>
+
             <br />
-            <p>Issue: {data.issue}</p>
-            <p>
-              Logged By:
-              {` ${data.loggedBy?.firstName} ${data.loggedBy?.lastName} (${data.loggedBy?.email})`}
-            </p>
-            <p>
-              Logged For:
-              {data.loggedFor
-                ? ` ${data.loggedFor.firstName} ${data.loggedFor.lastName} (${data.loggedFor.email})`
-                : " N/A"}
-            </p>
-            <p>
-              Date Logged:{" "}
-              {moment(data.dateLogged).format(formatting.dateTimeFormat)}
-            </p>
-            <p>Department: {data.department}</p>
-            <p>Allocated To: {data.assignedTo?.email}</p>
 
-            {data.moreInfo.length > 0 && (
-              <>
-                <br />
-                <h3>More Info</h3> <hr />
-                <br />
-                {data.moreInfo?.map((moreInfo) => (
-                  <p>{`${moment(moreInfo.date).format(
-                    formatting.dateTimeFormat
-                  )} - ${moreInfo.details}`}</p>
-                ))}
-                <br />
-              </>
-            )}
-
-            <h3>Ticket Actions</h3>
-            <hr />
-            <br />
-            {/* ensure only support agents who are assigned to the ticket can amend it */}
-            {(availableActions && user.role !== "support") ||
-            (user.role === "support" &&
-              (!data.assignedTo || data.assignedTo._id === user._id)) ? (
-              availableActions.map((action) => {
-                // check if there is an amount of time that needs to have passed before this action can be ran
-                if (action.days) {
-                  debugger;
-                  let daysSince = moment().diff(lastStatus.date, "days");
-                  if (daysSince <= action.days) return;
-                }
-                return (
-                  <button
-                    onClick={() => {
-                      let fn = this[action.fnString]; //get function from string
-                      if (typeof fn === "function") fn(action.order); // belt and braces, check its definitely a function in case of future changes
-                    }}
-                    key={action.order}
-                    className="btn-default"
-                  >
-                    {action.name}
-                  </button>
-                );
-              })
-            ) : (
-              <h6>No Ticket Actions Available</h6>
-            )}
-
-            {/* if the ticket is complete let an admin delete it */}
-            {lastStatus?.availableActions?.length === 0 &&
-              user.role === "admin" && (
-                <button onClick={this.deleteTicket} className="btn-default">
-                  Delete Ticket
-                </button>
-              )}
+            <Card>
+              <Card.Header>
+                <h3>Status History</h3>
+              </Card.Header>
+              <Card.Body>
+                {/* @todo add custom sorter for date */}
+                <Table
+                  // title="Status History"
+                  columns={columns}
+                  data={data.statusHistory || []}
+                  key={"order"}
+                  progressPending={this.state.loading}
+                />
+              </Card.Body>
+            </Card>
           </div>
-          <div className="col-md-6">
-            <h3>Current Status</h3>
-            <hr />
-            <br />
-            <p>Status: {lastStatus.currentStatus}</p>
-            <br />
-            <h3>Status History</h3>
-            <hr />
+
+          <div className="col-md-5">
+            <Card>
+              <Card.Header>
+                <h3>Current Status</h3>
+              </Card.Header>
+              <Card.Body>
+                <p>
+                  <span className="boldTitle">Status: </span>
+                  {lastStatus.currentStatus}
+                </p>
+              </Card.Body>
+            </Card>
+
             <br />
 
-            {/* @todo add custom sorter for date */}
-            <Table
-              // title="Status History"
-              columns={columns}
-              data={data.statusHistory || []}
-              key={"order"}
-              progressPending={this.state.loading}
-            />
-            <br />
-
-            <h3>Live Chat</h3>
-            <hr />
-            <br />
-
-            <div className="row">
-              <div className="col-md-6">
-                <Button onClick={this.showChatHistoryModal}>
-                  View Chat History
-                </Button>
-              </div>
-
-              <div className="col-md-6">
-                {/* if the user is a client let them start a new live chat */}
-                {user.role === "client" && (
-                  <Button onClick={this.startLiveChat}>
-                    Start New Live Chat
-                  </Button>
+            <Card>
+              <Card.Header>
+                <h3>Ticket Actions</h3>
+              </Card.Header>
+              <Card.Body>
+                {/* ensure only support agents who are assigned to the ticket can amend it */}
+                {(availableActions &&
+                  availableActions.length > 0 &&
+                  user.role !== "support") ||
+                (user.role === "support" &&
+                  (!data.assignedTo || data.assignedTo._id === user._id)) ? (
+                  availableActions.map((action) => {
+                    // check if there is an amount of time that needs to have passed before this action can be ran
+                    if (action.days) {
+                      debugger;
+                      let daysSince = moment().diff(lastStatus.date, "days");
+                      if (daysSince <= action.days) return;
+                    }
+                    return (
+                      <button
+                        onClick={() => {
+                          let fn = this[action.fnString]; //get function from string
+                          if (typeof fn === "function") fn(action.order); // belt and braces, check its definitely a function in case of future changes
+                        }}
+                        key={action.order}
+                        className="btn-default"
+                      >
+                        {action.name}
+                      </button>
+                    );
+                  })
+                ) : (
+                  <h6>No Ticket Actions Available</h6>
                 )}
 
-                {user.role === "support" &&
-                  data.chatHistory?.some((x) => x.active === true) && (
-                    // if the user is a support and there is an active live chat, let them join
-                    <Button
-                      onClick={() =>
-                        this.joinLiveChat(
-                          data.chatHistory?.find((x) => x.active === true)
-                        )
-                      }
-                    >
-                      Join Active Live Chat
+                {/* if the ticket is complete let an admin delete it */}
+                {lastStatus?.availableActions?.length === 0 &&
+                  user.role === "admin" && (
+                    <Button onClick={this.deleteTicket} className="btn-default">
+                      Delete Ticket
                     </Button>
                   )}
-              </div>
-            </div>
+              </Card.Body>
+            </Card>
+
+            <br />
+
+            <Card>
+              <Card.Header>
+                <h3>Live Chat</h3>
+              </Card.Header>
+              <Card.Body>
+                <div className="row">
+                  <div className="col-md-6">
+                    <Button
+                      onClick={this.showChatHistoryModal}
+                      className="btn-default"
+                    >
+                      View Chat History
+                    </Button>
+                  </div>
+
+                  <div className="col-md-6">
+                    {/* if the user is a client let them start a new live chat */}
+                    {user.role === "client" && (
+                      <Button
+                        onClick={this.startLiveChat}
+                        className="btn-default"
+                      >
+                        Start New Live Chat
+                      </Button>
+                    )}
+
+                    {user.role === "support" &&
+                      data.chatHistory?.some((x) => x.active === true) && (
+                        // if the user is a support and there is an active live chat, let them join
+                        <Button
+                          onClick={() =>
+                            this.joinLiveChat(
+                              data.chatHistory?.find((x) => x.active === true)
+                            )
+                          }
+                        >
+                          Join Active Live Chat
+                        </Button>
+                      )}
+                  </div>
+                </div>
+              </Card.Body>
+            </Card>
           </div>
         </div>
-        {/* <LoadingIndicator area="ticket-details-area" /> */}
+
+        {/* Modals */}
         <Modal
           title="Add More Information"
           BodyComponent={() => this.state.addInfoComponent}

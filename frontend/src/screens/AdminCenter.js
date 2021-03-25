@@ -12,6 +12,7 @@ import Modal from "../components/Modal";
 import CreateTicket from "./CreateTicket";
 import formatting from "../utility/formatting";
 import EditUser from "../components/EditUser";
+import { Card } from "react-bootstrap";
 
 export default class AdminCenter extends Component {
   constructor(props) {
@@ -144,15 +145,19 @@ export default class AdminCenter extends Component {
           loaderName={"edit-user-area"}
         />
 
-        <br />
-        <br />
-
-        <Table
-          title="Users"
-          columns={this.columns}
-          data={data}
-          progressPending={this.state.loading}
-        />
+        <Card>
+          <Card.Header>
+            <h3>Users</h3>
+          </Card.Header>
+          <Card.Body>
+            <Table
+              // title="Users"
+              columns={this.columns}
+              data={data}
+              progressPending={this.state.loading}
+            />
+          </Card.Body>
+        </Card>
       </div>
     );
   }
