@@ -575,6 +575,7 @@ export default class TicketDetails extends Component {
                               data.chatHistory?.find((x) => x.active === true)
                             )
                           }
+                          className="btn-default"
                         >
                           Join Active Live Chat
                         </Button>
