@@ -26,7 +26,7 @@ exports.register = async (req, res) => {
       // Issue token
       const payload = { email, _id: user._id };
       const token = jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: "1d",
+        expiresIn: "7d", // for testing purposes
       });
       //save token to db and return it
       user.accessToken = token;
@@ -73,7 +73,7 @@ exports.login = (req, res) => {
           // Issue token
           const payload = { email, _id: user._id };
           const token = jwt.sign(payload, process.env.JWT_SECRET, {
-            expiresIn: "1d",
+            expiresIn: "7d", // for testing purposes
           });
 
           user.accessToken = token;
