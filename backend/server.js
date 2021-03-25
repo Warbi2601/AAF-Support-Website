@@ -44,8 +44,7 @@ app.use("/api", require("./routes/api.routes")); //Main Router -- For authed use
 app.use("/auth", require("./routes/auth.routes")); //Auth Router
 
 //Chat Service - start:
-//Should this live here?
-//Check hardcoding & magic strings
+//This shouldn't be here and should be wrapped inside another file for SOC
 const chatServer = require("http").createServer();
 const io = require("socket.io")(chatServer, {
   cors: {
@@ -89,10 +88,6 @@ io.on("connection", (socket) => {
     //mark chat as complete if the user (client) who created the chat is the one who has disconnected
     ChatController.saveTicketChat(data, true);
 
-    // const { ticketID, userID } = data;
-
-    // ChatController.endChat(ticketID, roomId, userID); //roomId is chatID
-
     io.in(roomId).emit(chatDisconnect, data);
   });
 
@@ -124,3 +119,5 @@ app.use(function (err, req, res, next) {
   if (!err.statusCode) err.statusCode = 500;
   res.status(err.statusCode).send(err.message);
 });
+
+module.exports = app;
