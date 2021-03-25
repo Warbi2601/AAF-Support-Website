@@ -7,8 +7,12 @@ exports.getUser = (req, res) => {
 
   const user = res.locals.loggedInUser;
 
+  console.log("user requesting role - ", user.role);
+  console.log("user requesting id - ", user._id);
+  console.log("user requested id - ", id);
+
   // make it so a client can only hit this endpoint if they are getting info about themseleves
-  if (user.role === "client" && id !== user._id) {
+  if (user.role === "client" && id != user._id) {
     return res.status(403).json({
       error: "You don't have the correct permission to perform this action",
     });
@@ -21,7 +25,15 @@ exports.getUser = (req, res) => {
         error: "Internal error please try again",
       });
     } else {
-      res.status(200).json(user);
+      if (!user) {
+        res.status(404).json({
+          error: "User not found",
+        });
+      } else {
+        const { password, ...restOfUser } = user._doc;
+
+        res.status(200).json(restOfUser);
+      }
     }
   })
     .populate("loggedBy")

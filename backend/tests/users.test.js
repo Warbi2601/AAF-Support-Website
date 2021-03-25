@@ -3,55 +3,280 @@ let chaiHttp = require("chai-http");
 let server = require("../server");
 let should = chai.should();
 
-const adminToken =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImJAYi5jb20iLCJfaWQiOiI2MDNlM2Q4NWYxOTBkMzA0MTQ2YzU5ZWQiLCJpYXQiOjE2MTY2Mjc1ODAsImV4cCI6MTYxNzIzMjM4MH0.kDAn2gCUKIOQxlDbHoHAOHMrPrexFc4EP-jxZ78Fmds";
-const clientToken =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFAYS5jb20iLCJfaWQiOiI2MDNiOTFjMDM4YjkyODEzODRlYjg3MWYiLCJpYXQiOjE2MTY2Mjc2NDQsImV4cCI6MTYxNzIzMjQ0NH0.LQCT4FHwena3gwzypmnk6WHJ6hHG3NC07izyPL6mLc8";
-const supportToken =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNAYy5jb20iLCJfaWQiOiI2MDNlM2RlZWYxOTBkMzA0MTQ2YzU5ZWUiLCJpYXQiOjE2MTY2Mjc3MDcsImV4cCI6MTYxNzIzMjUwN30._WqjqH3299F_GUDMn9UkPXdfrjolIohzJ8pxApjEaBo";
+const adminToken = process.env.ADMIN_TOKEN;
+const clientToken = process.env.CLIENT_TOKEN;
+const supportToken = process.env.SUPPORT_TOKEN;
+
+const adminID = process.env.ADMIN_ID;
+const clientID = process.env.CLIENT_ID;
+const supportID = process.env.SUPPORT_ID;
+
+const endpoint = "/api/users";
+
+const testUserID = "605c88ab3ee9df51283c6dc0";
 
 chai.use(chaiHttp);
-// //the parent block
-// describe("home root", () => {
-//   it("it should return a 200", () => {
-//     chai
-//       .request(server)
-//       .get("/api/home/home")
-//       .set("x-access-token", clientToken)
-//       .end((err, res) => {
-//         res.should.have.status(200);
-//       });
-//   });
-// });
+let currentResponse = null; // for console logging responses when debugging
 
-describe("Get All Users Route", () => {
-  it("Client should return a 403", () => {
-    chai
-      .request(server)
-      .get("/api/users")
-      .set("x-access-token", clientToken)
-      .end((err, res) => {
-        res.should.have.status(403);
-      });
+describe("Users", () => {
+  afterEach(function () {
+    // for console logging responses when debugging
+    const body = currentResponse?.body;
+    console.log("Request Body", body);
+    currentResponse = null;
+  });
+  describe("GET/all", () => {
+    // Test to get all users
+    it("Client should return a 403", (done) => {
+      chai
+        .request(server)
+        .get(endpoint)
+        .set("x-access-token", clientToken)
+        .end((err, res) => {
+          currentResponse = res;
+          res.should.have.status(403);
+          done();
+        });
+    });
+
+    it("Admin should return an array of users", (done) => {
+      chai
+        .request(server)
+        .get(endpoint)
+        .set("x-access-token", adminToken)
+        .end((err, res) => {
+          currentResponse = res;
+          res.should.have.status(200);
+          res.body.should.be.a("array");
+          done();
+        });
+    });
+
+    it("Support should return an array of users", (done) => {
+      chai
+        .request(server)
+        .get(endpoint)
+        .set("x-access-token", supportToken)
+        .end((err, res) => {
+          currentResponse = res;
+          res.should.have.status(200);
+          res.body.should.be.a("array");
+          done();
+        });
+    });
   });
 
-  it("Admin should return a 200", () => {
-    chai
-      .request(server)
-      .get("/api/users")
-      .set("x-access-token", adminToken)
-      .end((err, res) => {
-        res.should.have.status(200);
-      });
+  // ------------------------
+
+  describe("GET/one", () => {
+    it("Client getting another user should return a 403", (done) => {
+      chai
+        .request(server)
+        .get(`${endpoint}/${supportID}`)
+        .set("x-access-token", clientToken)
+        .end((err, res) => {
+          currentResponse = res;
+          res.should.have.status(403);
+          done();
+        });
+    });
+
+    it("Client getting themselves should return a 200", (done) => {
+      chai
+        .request(server)
+        .get(`${endpoint}/${clientID}`)
+        .set("x-access-token", clientToken)
+        .end((err, res) => {
+          currentResponse = res;
+          res.should.have.status(200);
+          done();
+        });
+    });
+
+    it("Admin getting another user should return a user object no password 200", (done) => {
+      chai
+        .request(server)
+        .get(`${endpoint}/${clientID}`)
+        .set("x-access-token", adminToken)
+        .end((err, res) => {
+          currentResponse = res;
+          res.should.have.status(200);
+          res.body.should.be.a("object");
+          res.body.should.have.property("_id");
+          res.body.should.have.property("role");
+          res.body.should.have.property("email");
+          res.body.should.have.property("firstName");
+          res.body.should.have.property("lastName");
+          res.body.should.not.have.property("password");
+          done();
+        });
+    });
+
+    it("Support getting another user should return a user object no password 200", (done) => {
+      chai
+        .request(server)
+        .get(`${endpoint}/${clientID}`)
+        .set("x-access-token", supportToken)
+        .end((err, res) => {
+          currentResponse = res;
+          res.should.have.status(200);
+          res.body.should.be.a("object");
+          res.body.should.have.property("_id");
+          res.body.should.have.property("role");
+          res.body.should.have.property("email");
+          res.body.should.have.property("firstName");
+          res.body.should.have.property("lastName");
+          res.body.should.not.have.property("password");
+          done();
+        });
+    });
+
+    it("Any user getting another user that doesn't exist returns 404", (done) => {
+      chai
+        .request(server)
+        .get(`${endpoint}/605ba67458deb587e46da0e9`)
+        .set("x-access-token", supportToken)
+        .end((err, res) => {
+          currentResponse = res;
+          res.should.have.status(404);
+          done();
+        });
+    });
   });
 
-  it("Support should return a 200", () => {
-    chai
-      .request(server)
-      .get("/api/users")
-      .set("x-access-token", supportToken)
-      .end((err, res) => {
-        res.should.have.status(200);
-      });
+  describe("POST/", () => {
+    // it("Creating a valid new user returns 200 and user object - WARNING: User will need to be deleted after otherwise next time it will throw a duplicate email error", (done) => {
+    //   let newUser = {
+    //     email: "aaa@aaa.com",
+    //     password: "qwerty",
+    //     firstName: "aaa",
+    //     lastName: "aaa",
+    //     role: "client",
+    //   };
+    //   chai
+    //     .request(server)
+    //     .post("/auth/register")
+    //     .send(newUser)
+    //     .end((err, res) => {
+    //       currentResponse = res;
+    //       res.should.have.status(200);
+    //       res.body.user.should.be.a("object");
+    //       res.body.user.should.have.property("_id");
+    //       res.body.user.should.have.property("role");
+    //       res.body.user.should.have.property("email");
+    //       res.body.user.should.have.property("firstName");
+    //       res.body.user.should.have.property("lastName");
+    //       res.body.user.should.not.have.property("password");
+    //       res.body.should.have
+    //         .property("success")
+    //         .eql("Registered Successfully");
+    //       done();
+    //     });
+    // });
+
+    it("Creating a new user with invalid data returns 400", (done) => {
+      let newUser = {
+        email: "testemail@new.com",
+        password: "",
+        firstName: "",
+        lastName: "",
+        role: "",
+      };
+      chai
+        .request(server)
+        .post("/auth/register")
+        .send(newUser)
+        .end((err, res) => {
+          currentResponse = res;
+          res.should.have.status(500);
+          res.body.should.have
+            .property("error")
+            .eql("Error registering your account, try again.");
+          done();
+        });
+    });
+
+    it("Logging in with incorrect details returns 400", (done) => {
+      let credentials = {
+        email: "abcdef@ghijk.com",
+        password: "iqjsqhs",
+      };
+      chai
+        .request(server)
+        .post("/auth/login")
+        .send(credentials)
+        .end((err, res) => {
+          currentResponse = res;
+          res.should.have.status(401);
+          res.body.should.have
+            .property("error")
+            .eql("Incorrect email or password");
+          done();
+        });
+    });
+
+    it("Logging in with correct details from earlier returns 200 and user object", (done) => {
+      let credentials = {
+        email: "aaa@aaa.com",
+        password: "qwerty",
+      };
+      chai
+        .request(server)
+        .post("/auth/login")
+        .send(credentials)
+        .end((err, res) => {
+          currentResponse = res;
+          res.should.have.status(200);
+          res.body.should.be.a("object");
+          res.body.should.have.property("_id");
+          res.body.should.have.property("role");
+          res.body.should.have.property("email");
+          res.body.should.have.property("firstName");
+          res.body.should.have.property("lastName");
+          res.body.should.not.have.property("password");
+          // res.body.should.have
+          //   .property("success")
+          //   .eql("Registered Successfully");
+          done();
+        });
+    });
+  });
+
+  describe("DELETE/", () => {
+    it("Client delete valid user return 403", (done) => {
+      chai
+        .request(server)
+        .delete(`${endpoint}/${testUserID}`)
+        .set("x-access-token", clientToken)
+        .end((err, res) => {
+          currentResponse = res;
+          res.should.have.status(403);
+          done();
+        });
+    });
+
+    it("Support delete valid user return 403", (done) => {
+      chai
+        .request(server)
+        .delete(`${endpoint}/${testUserID}`)
+        .set("x-access-token", supportToken)
+        .end((err, res) => {
+          currentResponse = res;
+          res.should.have.status(403);
+          done();
+        });
+    });
+
+    // it("Admin delete valid user return 200", (done) => {
+    //   chai
+    //     .request(server)
+    //     .delete(`${endpoint}/${testUserID}`)
+    //     .set("x-access-token", adminToken)
+    //     .end((err, res) => {
+    //       currentResponse = res;
+    //       res.should.have.status(200);
+    //       done();
+    //     });
+    // });
   });
 });
